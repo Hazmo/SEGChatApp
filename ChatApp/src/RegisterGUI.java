@@ -1,4 +1,7 @@
-
+/**
+ * @author Ainur Makhmet - 1320744
+ * @email ainur.makhmet@kcl.ac.uk
+ */
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,13 +10,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class RegisterGUI extends JFrame implements ActionListener{
+/**
+ * Class extends JFrame and implements ActionListener
+ */
+class RegisterGUI extends JFrame implements ActionListener{
 
     private JPasswordField passwordField = new JPasswordField(15);
     private JPasswordField confirmPasswordField = new JPasswordField(15);
     private JTextField[] jFields = new JTextField[6];
 
-    public RegisterGUI() {
+    /**
+     *The constructor is called whenever the student wants to register.
+     */
+    RegisterGUI() {
         setTitle("REGISTRATION FORM");
 
         JPanel center = new JPanel(new GridLayout(6, 1, 10, 10));
@@ -71,6 +80,10 @@ public class RegisterGUI extends JFrame implements ActionListener{
         setVisible(true);
     }
 
+    /**
+     * handles events which are caused by the the buttons "SUBMIT" and "CANCEL" being clicked.
+     * @param e identifies which button is clicked
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("submitDetails")) {
@@ -84,7 +97,7 @@ public class RegisterGUI extends JFrame implements ActionListener{
                     e1.printStackTrace();
                 }
                 PrintWriter toFileWriter = new PrintWriter(registrationFileWriter);
-                // ',' divides the word into columns
+
                 toFileWriter.print("0");
                 toFileWriter.print(",");
                 toFileWriter.print(jFields[1].getText().toLowerCase());
@@ -97,13 +110,11 @@ public class RegisterGUI extends JFrame implements ActionListener{
                 toFileWriter.print(",");
                 toFileWriter.print(jFields[5].getText().toLowerCase());
                 toFileWriter.println();
-                //Flush the output to the file
+
                 toFileWriter.flush();
 
-                //Close the Print Writer
                 toFileWriter.close();
                 
-                //Close the File Writer
                 try {
                     registrationFileWriter.close();
                 } catch (IOException e1) {
@@ -117,6 +128,11 @@ public class RegisterGUI extends JFrame implements ActionListener{
             this.dispose();
         }
     }
+
+    /**
+     * this method checks whether the form is filled correctly.
+     * @return true if the form is filled correctly, otherwise notify the user about the problem and return false.
+     */
     private boolean check() {
         for (int i = 0; i < 6; i++) {
             if (jFields[i].getText().length() == 0) {
