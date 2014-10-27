@@ -24,6 +24,14 @@ public class ChatRoomClass {
         this.description = description;
         connections = 0;
     }
+    
+    /**
+     * getDesc method to return description of chat room
+     * @return description 
+     */
+    public String getDesc() {
+    	return description;
+    }
 
     @Override
     public String toString() {
