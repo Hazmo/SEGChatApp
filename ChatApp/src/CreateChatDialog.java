@@ -127,6 +127,7 @@ public class CreateChatDialog extends JFrame {
             String[] rowData = { chatRoomName, "0", chatRoomDescription };
 
             ChatRoomClass chatRoom = new ChatRoomClass(chatRoomName, chatRoomDescription);
+            studentFrame.addChatToList(chatRoom);
 
             for (TopicClass topic : studentFrame.topicsClasses) {
                 if (topic.toString().equals(topicName)) {
