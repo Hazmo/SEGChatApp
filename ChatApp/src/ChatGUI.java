@@ -5,10 +5,13 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.management.ObjectInstance;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,8 +22,8 @@ import javax.swing.JTextField;
 public class ChatGUI extends JFrame {
 
     Socket socket;
-    PrintWriter out;
-    BufferedReader in;
+    ObjectOutputStream out;
+    ObjectInputStream in;
 
     JTextArea chatWindow;
     JScrollPane jsp;
@@ -33,8 +36,10 @@ public class ChatGUI extends JFrame {
 
     ChatRoomClass chatRoom;
 
-    public ChatGUI(ChatRoomClass chatRoom) {
+    public ChatGUI(final ChatRoomClass chatRoom) {
         this.chatRoom = chatRoom;
+        
+        setTitle(chatRoom.toString());
 
         chatWindow = new JTextArea();
         jsp = new JScrollPane(chatWindow);
@@ -50,7 +55,14 @@ public class ChatGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String text = userName.getText() + ": " + enterText.getText();
-                out.println(text);
+                
+                MessageClass message = new MessageClass(text, chatRoom);
+                
+                try {
+					out.writeObject(message);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
                 enterText.setText("");
 
             }
@@ -89,9 +101,14 @@ public class ChatGUI extends JFrame {
 
     public void listenSocket() {
         try {
-            socket = new Socket("localhost", 444);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            socket = new Socket("localhost", 446);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+            
+            //Send the initial connection message to the server giving the information about this particular chatroom
+            //specifically it's name
+            MessageClass initialMessage = new MessageClass(null, chatRoom);
+            out.writeObject(initialMessage);
 
         }
         catch (UnknownHostException e) {

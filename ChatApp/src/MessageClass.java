@@ -18,6 +18,8 @@ public class MessageClass {
 
     /** The date and time at which the message was sent. */
     Date date;
+    
+    Timestamp timestamp;
 
     /**
      * Instantiates a new message class.
@@ -29,7 +31,8 @@ public class MessageClass {
     public MessageClass(String message, ChatRoomClass chatRoom) {
         this.message = message;
         this.chatRoom = chatRoom;
-        date = new Timestamp(date.getTime());
+        date = new Date();
+        timestamp = new Timestamp(date.getTime());
 
     }
 
