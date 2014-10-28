@@ -4,22 +4,10 @@
  */
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -199,6 +187,44 @@ public class StudentGUI extends JFrame {
                 }
 
             }
+        }
+
+        /**
+         *
+         * @param e
+         */
+        public void mousePressed(MouseEvent e){
+            if (e.isPopupTrigger())
+                doPop(e);
+        }
+
+        /**
+         *
+         * @param e
+         */
+        public void mouseReleased(MouseEvent e){
+            if (e.isPopupTrigger())
+                doPop(e);
+        }
+
+        /**
+         * creates a menu and shows it at the place where the current mouse location is
+         * @param e mouse event
+         */
+        private void doPop(MouseEvent e){
+            RightClickMenu menu = new RightClickMenu();
+            menu.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+
+    /**
+     * class with the constructor that creates menu on right mouse click.
+     */
+    class RightClickMenu extends JPopupMenu {
+        JMenuItem reportItem;
+        public RightClickMenu(){
+            reportItem = new JMenuItem("Report");
+            add(reportItem);
         }
     }
 
