@@ -30,7 +30,6 @@ class RegisterGUI extends JFrame implements ActionListener{
      *The constructor is called whenever the student wants to register.
      */
     RegisterGUI() {
-        getUserData();
         setTitle("REGISTRATION FORM");
 
         JPanel center = new JPanel(new GridLayout(6, 1, 10, 10));
@@ -47,6 +46,8 @@ class RegisterGUI extends JFrame implements ActionListener{
         JButton cancelButton = new JButton("CANCEL");
         south.add(submitButton);
         south.add(cancelButton);
+        
+        SwingUtilities.getRootPane(submitButton).setDefaultButton(submitButton);
 
         JLabel nameLabel = new JLabel("Name:");
         JLabel studentIdLabel  = new JLabel("Student ID:");
@@ -92,7 +93,6 @@ class RegisterGUI extends JFrame implements ActionListener{
      * handles events which are caused by the the buttons "SUBMIT" and "CANCEL" being clicked.
      * @param e identifies which button is clicked
      */
-    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("submitDetails")) {
             if (check()) {
