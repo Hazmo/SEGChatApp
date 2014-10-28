@@ -3,12 +3,18 @@
  * @email ainur.makhmet@kcl.ac.uk
  */
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Scanner;
 
 /**
  * Class extends JFrame and implements ActionListener
@@ -18,11 +24,13 @@ class RegisterGUI extends JFrame implements ActionListener{
     private JPasswordField passwordField = new JPasswordField(15);
     private JPasswordField confirmPasswordField = new JPasswordField(15);
     private JTextField[] jFields = new JTextField[6];
+    private String[][] userData;
 
     /**
      *The constructor is called whenever the student wants to register.
      */
     RegisterGUI() {
+        getUserData();
         setTitle("REGISTRATION FORM");
 
         JPanel center = new JPanel(new GridLayout(6, 1, 10, 10));
@@ -141,6 +149,7 @@ class RegisterGUI extends JFrame implements ActionListener{
                 return false;
             }
         }
+        
         char[] passwordCharArray = passwordField.getPassword();
         char[] confirmPasswordCharArray = confirmPasswordField.getPassword();
         String passwordString = new String(passwordCharArray);
@@ -149,6 +158,68 @@ class RegisterGUI extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(this, "You passwords do not match!");
             return false;
         }
+        
+        // Go through each row in userData 2d array, check if student ID already exists
+        // within the array, if so, user cannot be created
+        for(String[] row : userData) {
+        	if(row[0].equals(studentField.getText())) {
+        		JOptionPane.showMessageDialog(this, "Student ID already exists. Please try forgotten password option.");
+        		return false;
+        	}
+        }
+        
         return true;
+    }
+    
+    /**
+     * Method to get the data from the users csv file
+     */
+    public void getUserData() {
+    	File users = new File("users.csv");
+        int count = 0;
+        Scanner sc;
+        try {
+            sc = new Scanner(users);
+            while(sc.hasNextLine()) {
+                count++;
+                sc.nextLine();
+            }
+
+            sc.close();
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+
+        userData = new String[count][4];
+        
+        String csvFile = "users.csv";
+        BufferedReader br = null;
+        String line = "";
+        String csvSplitBy = ",";
+
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            int count2 = 0;
+            while((line = br.readLine()) != null) {
+                String[] temp = line.split(csvSplitBy);
+                userData[count2][0] = temp[1];
+                userData[count2][1] = temp[3];
+                userData[count2][2] = temp[4];
+                userData[count2][3] = temp[5];
+                count2++;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

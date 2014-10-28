@@ -7,7 +7,21 @@ import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 
+<<<<<<< HEAD
 import javax.swing.*;
+=======
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+>>>>>>> 7e9047112657781f199916eb3e3cf55a5655da36
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -59,6 +73,9 @@ public class StudentGUI extends JFrame {
 
     /** The array list of chat rooms. */
     ArrayList<ChatRoomClass> chatRooms = new ArrayList<ChatRoomClass>();
+    
+    /** Column headers for the table */
+    String[] columnHeaders = { "Room Name", "Users", "Description" };
 
     /** The button used to refresh the list of chat rooms. */
     JButton refreshButton = new JButton("Refresh List");
@@ -70,7 +87,6 @@ public class StudentGUI extends JFrame {
      * Instantiates a new student class.
      */
     public StudentGUI() {
-
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(500, 600);
         setLocationRelativeTo(null);
@@ -87,6 +103,8 @@ public class StudentGUI extends JFrame {
         JPanel searchPanel = new JPanel(new BorderLayout());
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchButton, BorderLayout.EAST);
+        
+        searchButton.addActionListener(new SearchButtonListener());
 
         JPanel northEastPanel = new JPanel(new FlowLayout());
         settingsButton.addActionListener(new SettingsButtonListener());
@@ -102,7 +120,6 @@ public class StudentGUI extends JFrame {
         JPanel topicRoomsPanel = new JPanel(new BorderLayout(15, 0));
         topicRoomsPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
 
-        String[] columnHeaders = { "Room Name", "Users", "Description" };
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         roomsTable.setDefaultRenderer(Object.class, centerRenderer);
@@ -147,6 +164,85 @@ public class StudentGUI extends JFrame {
         this.add(northPanel, BorderLayout.NORTH);
         this.add(topicRoomsPanel, BorderLayout.CENTER);
         this.add(southPanel, BorderLayout.SOUTH);
+    }
+    
+    /**
+     * Adds the new chatroom to the chatroom ArrayList
+     * @param ChatRoomClass 
+     * @see CreateChatDialog
+     */
+    public void addChatToList(ChatRoomClass chat) {
+    	chatRooms.add(chat);
+    }
+    
+    /**
+     * Search button listener class
+     * Takes user input from searchField JTextField and finds corresponding chatrooms.
+     * Results are stored within an ArrayList and stored in the JTable roomsTable.
+     * @author Roger
+     */
+    public class SearchButtonListener implements ActionListener {
+    	
+    	/**
+    	 * getResults methods returns chatrooms that correspond to search query
+    	 * @returns results ArrayList object
+    	 */
+    	ArrayList<ChatRoomClass> getResults(String toSearch) {
+    		ArrayList<ChatRoomClass> results = new ArrayList<ChatRoomClass>();
+    		
+    		for(ChatRoomClass chatRoom : chatRooms) {
+    			if(naiveSearch(chatRoom.toString().toLowerCase(), toSearch) || naiveSearch(chatRoom.getDesc().toLowerCase(), toSearch)) {
+    				results.add(chatRoom);
+    			}
+    		}
+    		
+    		return results; 
+    	}
+    	
+    	/**
+    	 * NaiveSearch algorithm, used to search for appropriate chat rooms
+    	 * @returns true or false value, dependent on whether match is found
+    	 */
+    	boolean naiveSearch(String text, String pattern) {
+    		int n = text.length();
+    		int m = pattern.length();
+    		
+    		for(int s = 0; s <= (n-m); s++) {
+    			String textPart = text.substring(s, (s+m));
+    			if(pattern.equals(textPart)) {
+    				return true;
+    			}
+    		}
+    		
+    		return false;
+     	}
+    	
+    	/**
+    	 * Method to add search results to the table
+    	 */
+    	void appendTable(ArrayList<ChatRoomClass> results) {
+    		DefaultTableModel tblResults = new DefaultTableModel(columnHeaders, 0);
+    		for(ChatRoomClass cr : results) {
+    			tblResults.addRow(cr.toArray());
+    		}
+    		roomsTable.setModel(tblResults);
+    	}
+    	
+    	@Override
+    	public void actionPerformed(ActionEvent e) {
+    		if(!searchField.getText().equals("")) {    			
+    			ArrayList<ChatRoomClass> results = getResults(searchField.getText().toLowerCase());
+    			if(results.isEmpty()) {
+    				JOptionPane.showMessageDialog(null, "No chatrooms found :-(");
+    			} else {    				
+    				appendTable(results);
+    			}
+    		} else {
+    			JOptionPane.showMessageDialog(null, "Please enter a search query");
+    		}
+    		
+    	}
+    	
     }
 
     /**
