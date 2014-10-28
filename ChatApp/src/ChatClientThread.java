@@ -1,48 +1,69 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ChatClientThread extends Thread {
 
     Socket client;
-    BufferedReader in = null;
-    PrintWriter out = null;
+    ObjectInputStream in = null;
+    ObjectOutputStream out = null;
+    
+    String roomName = null;
 
     public ChatClientThread(Socket client) {
         this.client = client;
 
     }
 
-    public void sendMessage(String message) {
-        out.println(message);
+    public void sendMessage(MessageClass message) throws IOException {
+        out.writeObject(message);
     }
 
     @Override
     public void run() {
-        String line;
+        MessageClass message;
         try {
-            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            out = new PrintWriter(client.getOutputStream(), true);
+            in = new ObjectInputStream(client.getInputStream());
+            out = new ObjectOutputStream(client.getOutputStream());
+            
+            MessageClass initialMessage = (MessageClass) in.readObject();
+            roomName = initialMessage.getRoomName();            
         }
         catch (IOException e) {
             System.out.println("I/O failed.");
             System.exit(-1);
-        }
+            
+        } catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        
 
         while (true) {
+        	
+        	
             try {
-                line = in.readLine();
-
+                message = (MessageClass) in.readObject();
+             
                 for (ChatClientThread thread : ChatServer.getClientThreads()) {
-                    thread.sendMessage(line);
-                }
+                	if(message.getRoomName().equals(thread.getRoomName())) {
+                		thread.sendMessage(message);
+                	}
+                }              
             }
             catch (IOException e) {
                 System.out.println("Read failed");
                 System.exit(-1);
-            }
+            } catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
+    }
+    
+    private String getRoomName() {
+    	return roomName;
     }
 }
