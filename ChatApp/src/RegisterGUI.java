@@ -30,6 +30,7 @@ class RegisterGUI extends JFrame implements ActionListener{
      *The constructor is called whenever the student wants to register.
      */
     RegisterGUI() {
+        getUserData();
         setTitle("REGISTRATION FORM");
 
         JPanel center = new JPanel(new GridLayout(6, 1, 10, 10));
