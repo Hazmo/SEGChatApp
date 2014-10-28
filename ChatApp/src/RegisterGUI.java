@@ -24,6 +24,7 @@ class RegisterGUI extends JFrame implements ActionListener{
     private JPasswordField passwordField = new JPasswordField(15);
     private JPasswordField confirmPasswordField = new JPasswordField(15);
     private JTextField[] jFields = new JTextField[6];
+    private JTextField studentField = new JTextField(15);
     private String[][] userData;
 
     /**
@@ -64,7 +65,6 @@ class RegisterGUI extends JFrame implements ActionListener{
         west.add(answerLabel);
 
         JTextField nameField = new JTextField(15);
-        JTextField studentField = new JTextField(15);
         JTextField questionField = new JTextField(15);
         JTextField answerField = new JTextField(15);
         jFields = new JTextField[]{nameField, studentField, passwordField, confirmPasswordField, questionField, answerField};
