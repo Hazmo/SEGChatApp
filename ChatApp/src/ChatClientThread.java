@@ -1,4 +1,5 @@
 package src;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,7 +10,7 @@ public class ChatClientThread extends Thread {
     Socket client;
     ObjectInputStream in = null;
     ObjectOutputStream out = null;
-    
+
     String roomName = null;
 
     public ChatClientThread(Socket client) {
@@ -27,44 +28,44 @@ public class ChatClientThread extends Thread {
         try {
             in = new ObjectInputStream(client.getInputStream());
             out = new ObjectOutputStream(client.getOutputStream());
-            
+
             MessageClass initialMessage = (MessageClass) in.readObject();
-            roomName = initialMessage.getRoomName();            
+            roomName = initialMessage.getRoomName();
         }
         catch (IOException e) {
+            System.out.println(e.getMessage());
             System.out.println("I/O failed.");
             System.exit(-1);
-            
-        } catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-        
+
+        }
+        catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         while (true) {
-        	
-        	
+
             try {
                 message = (MessageClass) in.readObject();
-             
+
                 for (ChatClientThread thread : ChatServer.getClientThreads()) {
-                	if(message.getRoomName().equals(thread.getRoomName())) {
-                		thread.sendMessage(message);
-                	}
-                }              
+                    if (message.getRoomName().equals(thread.getRoomName())) {
+                        thread.sendMessage(message);
+                    }
+                }
             }
             catch (IOException e) {
                 System.out.println("Read failed");
                 System.exit(-1);
-            } catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            }
+            catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
-    
+
     private String getRoomName() {
-    	return roomName;
+        return roomName;
     }
 }
