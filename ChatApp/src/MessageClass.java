@@ -1,3 +1,4 @@
+package src;
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk

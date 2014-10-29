@@ -1,3 +1,4 @@
+package src;
 public class UserClass {
     String userName;
     boolean isAdmin;

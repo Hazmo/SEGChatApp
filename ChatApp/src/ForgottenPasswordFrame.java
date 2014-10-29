@@ -1,3 +1,4 @@
+package src;
 /**
  * @author Ainur Makhmet - 1320744
  * @email ainur.makhmet@kcl.ac.uk

@@ -1,3 +1,4 @@
+package src;
 /**
  * The class used to store data related to a chat room class.
  */
