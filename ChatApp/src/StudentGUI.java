@@ -7,9 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-<<<<<<< HEAD
 import javax.swing.*;
-=======
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -21,7 +19,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
->>>>>>> 7e9047112657781f199916eb3e3cf55a5655da36
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
