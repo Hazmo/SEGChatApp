@@ -1,3 +1,5 @@
+package src;
+
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
@@ -8,22 +10,13 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 import javax.swing.*;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import src.StudentGUI.TableMouseListener.RightClickMenu;
 
 /**
  * This class is used to create GUI displaying all available chat rooms in their respective topics,
@@ -57,10 +50,10 @@ public class StudentGUI extends JFrame {
     JButton createButton = new JButton("Create chat room");
 
     /** The list scroll pane. */
-    JScrollPane listScrollPane = new JScrollPane(topicsList);
+    JScrollPane listScrollPane = new JScrollPane(this.topicsList);
 
     /** The table scroll pane. */
-    JScrollPane tableScrollPane = new JScrollPane(roomsTable);
+    JScrollPane tableScrollPane = new JScrollPane(this.roomsTable);
 
     /** The predefined topics. */
     String[] topics = { "Informatics", "Mathematics" };
@@ -70,7 +63,7 @@ public class StudentGUI extends JFrame {
 
     /** The array list of chat rooms. */
     ArrayList<ChatRoomClass> chatRooms = new ArrayList<ChatRoomClass>();
-    
+
     /** Column headers for the table */
     String[] columnHeaders = { "Room Name", "Users", "Description" };
 
@@ -80,15 +73,18 @@ public class StudentGUI extends JFrame {
     /** The array list of topic classes. */
     ArrayList<TopicClass> topicsClasses = new ArrayList<TopicClass>();
 
+    UserClass user;
+
     /**
      * Instantiates a new student class.
      */
-    public StudentGUI() {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(500, 600);
-        setLocationRelativeTo(null);
-        setLayout();
-        setVisible(true);
+    public StudentGUI(final UserClass user) {
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setSize(500, 600);
+        this.setLocationRelativeTo(null);
+        this.setLayout();
+        this.setVisible(true);
+        this.user = user;
     }
 
     /**
@@ -97,149 +93,154 @@ public class StudentGUI extends JFrame {
     public void setLayout() {
         this.setLayout(new BorderLayout(0, 20));
 
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(searchButton, BorderLayout.EAST);
-        
-        searchButton.addActionListener(new SearchButtonListener());
+        final JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.add(this.searchField, BorderLayout.CENTER);
+        searchPanel.add(this.searchButton, BorderLayout.EAST);
 
-        JPanel northEastPanel = new JPanel(new FlowLayout());
-        settingsButton.addActionListener(new SettingsButtonListener());
-        northEastPanel.add(settingsButton);
-        northEastPanel.add(signoutButton);
+        this.searchButton.addActionListener(new SearchButtonListener());
 
-        JPanel northPanel = new JPanel(new BorderLayout(0, 20));
+        final JPanel northEastPanel = new JPanel(new FlowLayout());
+        this.settingsButton.addActionListener(new SettingsButtonListener());
+        northEastPanel.add(this.settingsButton);
+        northEastPanel.add(this.signoutButton);
+
+        final JPanel northPanel = new JPanel(new BorderLayout(0, 20));
         northPanel.add(searchPanel, BorderLayout.CENTER);
         northPanel.add(northEastPanel, BorderLayout.EAST);
 
         // The following (~20) lines set up the table containing the chat rooms
 
-        JPanel topicRoomsPanel = new JPanel(new BorderLayout(15, 0));
+        final JPanel topicRoomsPanel = new JPanel(new BorderLayout(15, 0));
         topicRoomsPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
 
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        roomsTable.setDefaultRenderer(Object.class, centerRenderer);
-        roomsTable.setShowVerticalLines(false);
-        roomsTable.setModel(new DefaultTableModel(columnHeaders, 0) {
+        this.roomsTable.setDefaultRenderer(Object.class, centerRenderer);
+        this.roomsTable.setShowVerticalLines(false);
+        this.roomsTable.setModel(new DefaultTableModel(this.columnHeaders, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(final int row, final int column) {
                 return false;
             }
         });
-        roomsTable.addMouseListener(new TableMouseListener());
-        tableModel = (DefaultTableModel) roomsTable.getModel();
-        roomsTable.setRowHeight(20);
-        TitledBorder tableTitle = new TitledBorder("Chat Rooms");
-        tableTitle.setTitleJustification(tableTitle.CENTER);
-        tableScrollPane.setBorder(tableTitle);
-        topicRoomsPanel.add(tableScrollPane);
+        this.roomsTable.addMouseListener(new TableMouseListener());
+        this.tableModel = (DefaultTableModel) this.roomsTable.getModel();
+        this.roomsTable.setRowHeight(20);
+        final TitledBorder tableTitle = new TitledBorder("Chat Rooms");
+        tableTitle.setTitleJustification(TitledBorder.CENTER);
+        this.tableScrollPane.setBorder(tableTitle);
+        topicRoomsPanel.add(this.tableScrollPane);
 
         /*
          * Adds all the topics to the model of the JList holding them and adds the topic to the
          * topics ArrayList. The lines that follow set up the list of topics.
          */
 
-        for (int i = 0; i < topics.length; i++) {
-            listModel.addElement(topics[i]);
-            topicsClasses.add(new TopicClass(topics[i]));
+        for (int i = 0; i < this.topics.length; i++) {
+            this.listModel.addElement(this.topics[i]);
+            this.topicsClasses.add(new TopicClass(this.topics[i]));
         }
-        topicsList.setModel(listModel);
-        TitledBorder listTitle = new TitledBorder("Topics List");
-        listTitle.setTitleJustification(listTitle.CENTER);
-        topicsList.addListSelectionListener(new TopicsMouseSelectionListener());
-        topicsList.setLayoutOrientation(JList.VERTICAL);
-        topicsList.setFixedCellWidth(100);
-        topicsList.setBorder(listTitle);
-        topicRoomsPanel.add(listScrollPane, BorderLayout.WEST);
+        this.topicsList.setModel(this.listModel);
+        final TitledBorder listTitle = new TitledBorder("Topics List");
+        listTitle.setTitleJustification(TitledBorder.CENTER);
+        this.topicsList.addListSelectionListener(new TopicsMouseSelectionListener());
+        this.topicsList.setLayoutOrientation(JList.VERTICAL);
+        this.topicsList.setFixedCellWidth(100);
+        this.topicsList.setBorder(listTitle);
+        topicRoomsPanel.add(this.listScrollPane, BorderLayout.WEST);
 
-        JPanel southPanel = new JPanel(new FlowLayout());
-        createButton.addActionListener(new CreateButtonListener(this));
-        southPanel.add(createButton);
-        southPanel.add(refreshButton);
+        final JPanel southPanel = new JPanel(new FlowLayout());
+        this.createButton.addActionListener(new CreateButtonListener(this));
+        southPanel.add(this.createButton);
+        southPanel.add(this.refreshButton);
 
         this.add(northPanel, BorderLayout.NORTH);
         this.add(topicRoomsPanel, BorderLayout.CENTER);
         this.add(southPanel, BorderLayout.SOUTH);
     }
-    
+
     /**
      * Adds the new chatroom to the chatroom ArrayList
-     * @param ChatRoomClass 
+     * @param ChatRoomClass
      * @see CreateChatDialog
      */
-    public void addChatToList(ChatRoomClass chat) {
-    	chatRooms.add(chat);
+    public void addChatToList(final ChatRoomClass chat) {
+        this.chatRooms.add(chat);
     }
-    
+
     /**
-     * Search button listener class
-     * Takes user input from searchField JTextField and finds corresponding chatrooms.
-     * Results are stored within an ArrayList and stored in the JTable roomsTable.
+     * Search button listener class Takes user input from searchField JTextField and finds
+     * corresponding chatrooms. Results are stored within an ArrayList and stored in the JTable
+     * roomsTable.
      * @author Roger
      */
     public class SearchButtonListener implements ActionListener {
-    	
-    	/**
-    	 * getResults methods returns chatrooms that correspond to search query
-    	 * @returns results ArrayList object
-    	 */
-    	ArrayList<ChatRoomClass> getResults(String toSearch) {
-    		ArrayList<ChatRoomClass> results = new ArrayList<ChatRoomClass>();
-    		
-    		for(ChatRoomClass chatRoom : chatRooms) {
-    			if(naiveSearch(chatRoom.toString().toLowerCase(), toSearch) || naiveSearch(chatRoom.getDesc().toLowerCase(), toSearch)) {
-    				results.add(chatRoom);
-    			}
-    		}
-    		
-    		return results; 
-    	}
-    	
-    	/**
-    	 * NaiveSearch algorithm, used to search for appropriate chat rooms
-    	 * @returns true or false value, dependent on whether match is found
-    	 */
-    	boolean naiveSearch(String text, String pattern) {
-    		int n = text.length();
-    		int m = pattern.length();
-    		
-    		for(int s = 0; s <= (n-m); s++) {
-    			String textPart = text.substring(s, (s+m));
-    			if(pattern.equals(textPart)) {
-    				return true;
-    			}
-    		}
-    		
-    		return false;
-     	}
-    	
-    	/**
-    	 * Method to add search results to the table
-    	 */
-    	void appendTable(ArrayList<ChatRoomClass> results) {
-    		DefaultTableModel tblResults = new DefaultTableModel(columnHeaders, 0);
-    		for(ChatRoomClass cr : results) {
-    			tblResults.addRow(cr.toArray());
-    		}
-    		roomsTable.setModel(tblResults);
-    	}
-    	
-    	@Override
-    	public void actionPerformed(ActionEvent e) {
-    		if(!searchField.getText().equals("")) {    			
-    			ArrayList<ChatRoomClass> results = getResults(searchField.getText().toLowerCase());
-    			if(results.isEmpty()) {
-    				JOptionPane.showMessageDialog(null, "No chatrooms found :-(");
-    			} else {    				
-    				appendTable(results);
-    			}
-    		} else {
-    			JOptionPane.showMessageDialog(null, "Please enter a search query");
-    		}
-    		
-    	}
-    	
+
+        /**
+         * getResults methods returns chatrooms that correspond to search query
+         * @returns results ArrayList object
+         */
+        ArrayList<ChatRoomClass> getResults(final String toSearch) {
+            final ArrayList<ChatRoomClass> results = new ArrayList<ChatRoomClass>();
+
+            for (final ChatRoomClass chatRoom : StudentGUI.this.chatRooms) {
+                if (this.naiveSearch(chatRoom.toString().toLowerCase(), toSearch)
+                        || this.naiveSearch(chatRoom.getDesc().toLowerCase(), toSearch)) {
+                    results.add(chatRoom);
+                }
+            }
+
+            return results;
+        }
+
+        /**
+         * NaiveSearch algorithm, used to search for appropriate chat rooms
+         * @returns true or false value, dependent on whether match is found
+         */
+        boolean naiveSearch(final String text, final String pattern) {
+            final int n = text.length();
+            final int m = pattern.length();
+
+            for (int s = 0; s <= (n - m); s++) {
+                final String textPart = text.substring(s, (s + m));
+                if (pattern.equals(textPart)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Method to add search results to the table
+         */
+        void appendTable(final ArrayList<ChatRoomClass> results) {
+            final DefaultTableModel tblResults = new DefaultTableModel(
+                    StudentGUI.this.columnHeaders, 0);
+            for (final ChatRoomClass cr : results) {
+                tblResults.addRow(cr.toArray());
+            }
+            StudentGUI.this.roomsTable.setModel(tblResults);
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            if (!StudentGUI.this.searchField.getText().equals("")) {
+                final ArrayList<ChatRoomClass> results = this
+                        .getResults(StudentGUI.this.searchField.getText().toLowerCase());
+                if (results.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No chatrooms found :-(");
+                }
+                else {
+                    this.appendTable(results);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Please enter a search query");
+            }
+
+        }
+
     }
 
     /**
@@ -253,8 +254,8 @@ public class StudentGUI extends JFrame {
         SettingsClass settingsFrame;
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            settingsFrame = new SettingsClass();
+        public void actionPerformed(final ActionEvent e) {
+            this.settingsFrame = new SettingsClass(StudentGUI.this.user);
         }
     }
 
@@ -268,13 +269,13 @@ public class StudentGUI extends JFrame {
     public class TableMouseListener extends MouseAdapter {
 
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void mouseClicked(final MouseEvent e) {
             if (e.getClickCount() == 2) {
-                int tableIndex = roomsTable.getSelectedRow();
-                String topicString = (String) topicsList.getSelectedValue();
-                for (TopicClass topic : topicsClasses) {
+                final int tableIndex = StudentGUI.this.roomsTable.getSelectedRow();
+                final String topicString = (String) StudentGUI.this.topicsList.getSelectedValue();
+                for (final TopicClass topic : StudentGUI.this.topicsClasses) {
                     if (topic.toString().equals(topicString)) {
-                        ChatRoomClass chatRoom = topic.getChatRooms().get(tableIndex);
+                        final ChatRoomClass chatRoom = topic.getChatRooms().get(tableIndex);
                         new ChatGUI(chatRoom);
                     }
                 }
@@ -283,41 +284,45 @@ public class StudentGUI extends JFrame {
         }
 
         /**
-         *
          * @param e
          */
-        public void mousePressed(MouseEvent e){
-            if (e.isPopupTrigger())
-                doPop(e);
+        @Override
+        public void mousePressed(final MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                this.doPop(e);
+            }
         }
 
         /**
-         *
          * @param e
          */
-        public void mouseReleased(MouseEvent e){
-            if (e.isPopupTrigger())
-                doPop(e);
+        @Override
+        public void mouseReleased(final MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                this.doPop(e);
+            }
         }
 
         /**
          * creates a menu and shows it at the place where the current mouse location is
-         * @param e mouse event
+         * @param e
+         *        mouse event
          */
-        private void doPop(MouseEvent e){
-            RightClickMenu menu = new RightClickMenu();
+        private void doPop(final MouseEvent e) {
+            final RightClickMenu menu = new RightClickMenu();
             menu.show(e.getComponent(), e.getX(), e.getY());
         }
-    }
 
-    /**
-     * class with the constructor that creates menu on right mouse click.
-     */
-    class RightClickMenu extends JPopupMenu {
-        JMenuItem reportItem;
-        public RightClickMenu(){
-            reportItem = new JMenuItem("Report");
-            add(reportItem);
+        /**
+         * class with the constructor that creates menu on right mouse click.
+         */
+        class RightClickMenu extends JPopupMenu {
+            JMenuItem reportItem;
+
+            public RightClickMenu() {
+                this.reportItem = new JMenuItem("Report");
+                this.add(this.reportItem);
+            }
         }
     }
 
@@ -338,13 +343,13 @@ public class StudentGUI extends JFrame {
          * @param studentFrame
          *        the student frame
          */
-        public CreateButtonListener(JFrame studentFrame) {
+        public CreateButtonListener(final JFrame studentFrame) {
             this.studentFrame = (StudentGUI) studentFrame;
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            createChatRoom = new CreateChatDialog(studentFrame);
+        public void actionPerformed(final ActionEvent e) {
+            this.createChatRoom = new CreateChatDialog(this.studentFrame);
         }
     }
 
@@ -357,11 +362,11 @@ public class StudentGUI extends JFrame {
     public class TopicsMouseSelectionListener implements ListSelectionListener {
 
         @Override
-        public void valueChanged(ListSelectionEvent e) {
-            String topicString = (String) topicsList.getSelectedValue();
-            for (TopicClass topic : topicsClasses) {
+        public void valueChanged(final ListSelectionEvent e) {
+            final String topicString = (String) StudentGUI.this.topicsList.getSelectedValue();
+            for (final TopicClass topic : StudentGUI.this.topicsClasses) {
                 if (topic.topicName.equals(topicString)) {
-                    roomsTable.setModel(topic.getTableModel());
+                    StudentGUI.this.roomsTable.setModel(topic.getTableModel());
                 }
             }
         }
