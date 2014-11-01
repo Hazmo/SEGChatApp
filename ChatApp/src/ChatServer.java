@@ -31,16 +31,10 @@ public class ChatServer {
             RegisterThread rt = new RegisterThread(registerServer);
             rt.start();
 
-            try {
+            ChatClientThread ccl = new ChatClientThread(server);
+            clientWorkers.add(ccl);
+            ccl.start();
 
-                ChatClientThread ccl = new ChatClientThread(server.accept());
-                clientWorkers.add(ccl);
-                ccl.start();
-            }
-            catch (IOException e) {
-                System.out.println("Accept failed: 4455");
-                System.exit(-1);
-            }
         }
     }
 

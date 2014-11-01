@@ -25,21 +25,23 @@ public class RegisterThread extends Thread {
 
     @Override
     public void run() {
-        try {
-            Socket s = registerServer.accept();
-            out = new ObjectOutputStream(s.getOutputStream());
-            in = new ObjectInputStream(s.getInputStream());
-            jFields = (JTextField[]) in.readObject();
-            boolean registered = registerUser();
-            out.writeObject(registered);
-        }
-        catch (Exception e) {
-            if (e.getClass().equals(IOException.class)) {
-                System.out.println("Accept failed: 4456");
-                System.exit(-1);
+        while (true) {
+            try {
+                Socket s = registerServer.accept();
+                out = new ObjectOutputStream(s.getOutputStream());
+                in = new ObjectInputStream(s.getInputStream());
+                jFields = (JTextField[]) in.readObject();
+                boolean registered = registerUser();
+                out.writeObject(registered);
             }
-            else if (e.getClass().equals(ClassNotFoundException.class))
-                e.printStackTrace();
+            catch (Exception e) {
+                if (e.getClass().equals(IOException.class)) {
+                    System.out.println("Accept failed: 4456");
+                    System.exit(-1);
+                }
+                else if (e.getClass().equals(ClassNotFoundException.class))
+                    e.printStackTrace();
+            }
         }
     }
 
