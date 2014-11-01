@@ -50,7 +50,7 @@ class RegisterGUI extends JFrame implements ActionListener {
     RegisterGUI() {
 
         try {
-            socket = new Socket("localhost", 4455);
+            socket = new Socket("localhost", 4456);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         }
@@ -173,7 +173,7 @@ class RegisterGUI extends JFrame implements ActionListener {
         String passwordString = new String(passwordCharArray);
         String confirmPasswordString = new String(confirmPasswordCharArray);
         if (!passwordString.equals(confirmPasswordString)) {
-            JOptionPane.showMessageDialog(this, "You passwords do not match!");
+            JOptionPane.showMessageDialog(this, "Your passwords do not match!");
             return false;
         }
 

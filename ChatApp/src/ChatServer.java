@@ -1,27 +1,16 @@
 package src;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
-
-import javax.swing.JTextField;
 
 public class ChatServer {
 
     ServerSocket server;
+    ServerSocket registerServer;
     Socket client;
     static ArrayList<ChatClientThread> clientWorkers = new ArrayList<ChatClientThread>();
-    JTextField[] jFields = new JTextField[6];
-    String[][] userData;
-    File users;
 
     public ChatServer() {
         // getUserData();
@@ -30,6 +19,7 @@ public class ChatServer {
     public void listenSocket() {
         try {
             server = new ServerSocket(4455);
+            registerServer = new ServerSocket(4456);
         }
         catch (IOException e) {
             System.out.println("Could not listen to port");
@@ -37,7 +27,10 @@ public class ChatServer {
         }
 
         while (true) {
-            ChatClientThread w;
+
+            RegisterThread rt = new RegisterThread(registerServer);
+            rt.start();
+
             try {
 
                 ChatClientThread ccl = new ChatClientThread(server.accept());
@@ -45,47 +38,10 @@ public class ChatServer {
                 ccl.start();
             }
             catch (IOException e) {
-                System.out.println("Accept failed: 4444");
+                System.out.println("Accept failed: 4455");
                 System.exit(-1);
             }
         }
-    }
-
-    public boolean registerUser() {
-        FileWriter registrationFileWriter = null;
-        try {
-            registrationFileWriter = new FileWriter("users.csv", true);
-        }
-        catch (IOException e1) {
-            e1.printStackTrace();
-            return false;
-        }
-        PrintWriter toFileWriter = new PrintWriter(registrationFileWriter);
-
-        toFileWriter.print("0");
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[1].getText().toLowerCase());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[0].getText());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[2].getText());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[4].getText());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[5].getText().toLowerCase());
-        toFileWriter.println();
-
-        toFileWriter.flush();
-
-        toFileWriter.close();
-
-        try {
-            registrationFileWriter.close();
-        }
-        catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        return true;
     }
 
     /**
