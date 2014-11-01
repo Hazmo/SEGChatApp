@@ -50,7 +50,7 @@ class RegisterGUI extends JFrame implements ActionListener {
     RegisterGUI() {
 
         try {
-            socket = new Socket("localhost", 4455);
+            socket = new Socket("localhost", 4456);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         }
@@ -129,7 +129,7 @@ class RegisterGUI extends JFrame implements ActionListener {
                 boolean confirmation = false;
                 try {
                     out.writeObject(jFields);
-                    confirmation = (boolean) in.readObject();
+                    confirmation = (Boolean)in.readObject();
                 }
 
                 catch (Exception e1) {
@@ -150,7 +150,15 @@ class RegisterGUI extends JFrame implements ActionListener {
             }
         }
         else if (e.getActionCommand().equals("cancelRegistration")) {
+            try {
+                socket.close();
+                in.close();
+                out.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             this.dispose();
+
         }
     }
 
@@ -173,19 +181,19 @@ class RegisterGUI extends JFrame implements ActionListener {
         String passwordString = new String(passwordCharArray);
         String confirmPasswordString = new String(confirmPasswordCharArray);
         if (!passwordString.equals(confirmPasswordString)) {
-            JOptionPane.showMessageDialog(this, "You passwords do not match!");
+            JOptionPane.showMessageDialog(this, "Your passwords do not match!");
             return false;
         }
 
         // Go through each row in userData 2d array, check if student ID already exists
         // within the array, if so, user cannot be created
-        // for (String[] row : userData) {
-        // if (row[0].equals(studentField.getText())) {
-        // JOptionPane.showMessageDialog(this,
-        // "Student ID already exists. Please try forgotten password option.");
-        // return false;
-        // }
-        // }
+        /*for (String[] row : userData) {
+        	if (row[0].equals(studentField.getText())) {
+        		JOptionPane.showMessageDialog(this,
+        				"Student ID already exists. Please try forgotten password option.");
+        		return false;
+        	}
+        }*/
 
         return true;
     }

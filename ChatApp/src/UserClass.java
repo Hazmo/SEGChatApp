@@ -1,6 +1,8 @@
 package src;
 
-public class UserClass {
+import java.io.Serializable;
+
+public class UserClass implements Serializable {
     String[] userData;
 
     public UserClass(final String[] userData) {

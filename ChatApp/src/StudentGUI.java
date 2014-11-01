@@ -79,12 +79,12 @@ public class StudentGUI extends JFrame {
      * Instantiates a new student class.
      */
     public StudentGUI(final UserClass user) {
+    	this.user = user;
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(500, 600);
         this.setLocationRelativeTo(null);
         this.setLayout();
         this.setVisible(true);
-        this.user = user;
     }
 
     /**

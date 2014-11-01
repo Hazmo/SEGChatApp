@@ -6,12 +6,16 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -72,8 +76,33 @@ public class LoginGUI extends JFrame {
     private void addListeners() {
 
         // setting the listener for the login button
-        final LoginListener login = new LoginListener(studentIDField, passField);
-        loginButton.addActionListener(login);
+        loginButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				try(Socket login = new Socket("localhost", 4457);
+					PrintWriter out = new PrintWriter(login.getOutputStream(), true);
+					ObjectInputStream in = new ObjectInputStream(login.getInputStream());
+				) {
+					out.println(studentIDField.getText());
+					out.println(new String(passField.getPassword()));
+					
+					boolean loginConfirm = (boolean) in.readObject();
+					
+					if(loginConfirm) {
+						UserClass user = (UserClass) in.readObject();
+						new StudentGUI(user);
+						dispose();
+					} else {
+						JOptionPane.showMessageDialog(null, "Error: Incorrect username or password.", "Error", 0);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+        	
+        });
 
         SwingUtilities.getRootPane(loginButton).setDefaultButton(loginButton);
 
