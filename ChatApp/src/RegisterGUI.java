@@ -50,7 +50,7 @@ class RegisterGUI extends JFrame implements ActionListener {
     RegisterGUI() {
 
         try {
-            socket = new Socket("localhost", 4456);
+            socket = new Socket("localhost", 4459);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         }
@@ -126,27 +126,46 @@ class RegisterGUI extends JFrame implements ActionListener {
         if (e.getActionCommand().equals("submitDetails")) {
             if (check()) {
 
-                boolean confirmation = false;
+                int confirmation = 0;
                 try {
                     out.writeObject(jFields);
-                    confirmation = (boolean) in.readObject();
+                    confirmation = (int) in.readObject();
                 }
 
                 catch (Exception e1) {
                     e1.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Registration failed!");
+                    confirmation = 3;
                 }
 
-                if (confirmation == true) {
+                switch (confirmation) {
+                case (1): {
                     JOptionPane
                             .showMessageDialog(this,
                                     "Congratulations with successful registration! To log in use your password and student ID.");
                     this.dispose();
-
+                    break;
                 }
-                else
-                    JOptionPane.showMessageDialog(this, "Registration failed!");
 
+                case (2): {
+                    JOptionPane.showMessageDialog(this,
+                            "Registration failed! Problem with the user database!");
+                    this.dispose();
+                    break;
+                }
+
+                case (3): {
+                    JOptionPane.showMessageDialog(this,
+                            "Registration failed, problem with connection to server!");
+                    this.dispose();
+                    break;
+                }
+                case (4): {
+                    JOptionPane.showMessageDialog(this,
+                            "Registration failed, this ID has already been registered!");
+                    this.dispose();
+                    break;
+                }
+                }
             }
         }
         else if (e.getActionCommand().equals("cancelRegistration")) {
