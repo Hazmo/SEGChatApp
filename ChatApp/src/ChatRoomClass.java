@@ -1,8 +1,11 @@
 package src;
+
+import java.io.Serializable;
+
 /**
  * The class used to store data related to a chat room class.
  */
-public class ChatRoomClass {
+public class ChatRoomClass implements Serializable {
 
     /** The number of current connections made by clients to the chat room. */
     int connections;
@@ -25,13 +28,13 @@ public class ChatRoomClass {
         this.description = description;
         connections = 0;
     }
-    
+
     /**
      * getDesc method to return description of chat room
-     * @return description 
+     * @return description
      */
     public String getDesc() {
-    	return description;
+        return description;
     }
 
     @Override

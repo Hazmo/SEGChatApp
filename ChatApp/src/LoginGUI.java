@@ -1,32 +1,43 @@
 package src;
-import javax.swing.*;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.*;
-import java.util.Scanner;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class LoginGUI extends JFrame {
 
-     private JLabel studentLabel = new JLabel("Student ID: ");
-     private JLabel passLabel = new JLabel("Password: ");
-     public JTextField studentIDField = new JTextField(20);
-     public JPasswordField passField = new JPasswordField(20);
-     private JButton loginButton = new JButton("Log In");
-     private JButton registerButton = new JButton("Register");
-     private JLabel forgottenPassLabel = new JLabel("<html><b><u>Forgotten your password?" +
-     		"</u></b></html>");
-	
+    private JLabel studentLabel = new JLabel("Student ID: ");
+    private JLabel passLabel = new JLabel("Password: ");
+    public JTextField studentIDField = new JTextField(20);
+    public JPasswordField passField = new JPasswordField(20);
+    private JButton loginButton = new JButton("Log In");
+    private JButton registerButton = new JButton("Register");
+    private JLabel forgottenPassLabel = new JLabel("<html><b><u>Forgotten your password?"
+            + "</u></b></html>");
+    File csvFile = new File("users.csv");
+
     /**
-     *  Default constructor
+     * Default constructor
      */
     public LoginGUI() {
-    	setTitle("Log in");
+        setTitle("Log in");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout();
         setVisible(true);
@@ -38,7 +49,7 @@ public class LoginGUI extends JFrame {
 
     /** setting the layout of the frame with all the widgets */
     private void setLayout() {
-    	((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
+        ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
 
@@ -57,30 +68,53 @@ public class LoginGUI extends JFrame {
         buttonsPanel.add(loginButton);
         buttonsPanel.add(registerButton);
 
-
         centerPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         add(centerPanel);
     }
-    
-    private void addListeners(){
-        
+
+    private void addListeners() {
+
         // setting the listener for the login button
-    	final LoginListener login = new LoginListener(studentIDField, passField);
-    	loginButton.addActionListener(login);
-    	
-    	SwingUtilities.getRootPane(loginButton).setDefaultButton(loginButton);
-    	
-        //setting the listener for the register file
-    	registerButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent event) {
-				new RegisterGUI();
-			}
-		});
-    	
-        //setting the listener for using the security question
-    	forgottenPassLabel.addMouseListener(new SecurityListener());
+        loginButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                try (Socket login = new Socket("localhost", 4457);
+                        PrintWriter out = new PrintWriter(login.getOutputStream(), true);
+                        ObjectInputStream in = new ObjectInputStream(login.getInputStream());) {
+                    out.println(studentIDField.getText());
+                    out.println(new String(passField.getPassword()));
+
+                    boolean loginConfirm = (boolean) in.readObject();
+
+                    if (loginConfirm) {
+                        UserClass user = (UserClass) in.readObject();
+                        new StudentGUI(user);
+                        dispose();
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null,
+                                "Error: Incorrect username or password.", "Error", 0);
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        SwingUtilities.getRootPane(loginButton).setDefaultButton(loginButton);
+
+        // setting the listener for the register file
+        registerButton.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent event) {
+                new RegisterGUI();
+            }
+        });
+
+        // setting the listener for using the security question
+        forgottenPassLabel.addMouseListener(new SecurityListener());
     }
-    
 }

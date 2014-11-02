@@ -1,19 +1,28 @@
 package src;
 
-import javax.swing.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 public class LoginListener implements ActionListener {
 
     private final JTextField studentIDField;
     private final JPasswordField passField;
+    Socket socket;
+    ObjectOutputStream out;
+    ObjectInputStream in;
 
     /**
      * Parametric constructor providing the text field and the password field from the login
@@ -97,6 +106,14 @@ public class LoginListener implements ActionListener {
         }
         if (login_true == true) {
             System.out.println("Correct login");
+//            try {
+//                socket = new Socket("localhost", 446);
+//                out = new ObjectOutputStream(socket.getOutputStream());
+//                in = new ObjectInputStream(socket.getInputStream());
+//            }
+//            catch (Exception e) {
+//                e.printStackTrace();
+//            }
             new StudentGUI(new UserClass(userLoginData));
         }
         else {

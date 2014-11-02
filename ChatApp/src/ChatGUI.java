@@ -1,4 +1,5 @@
 package src;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -39,7 +40,7 @@ public class ChatGUI extends JFrame {
 
     public ChatGUI(final ChatRoomClass chatRoom) {
         this.chatRoom = chatRoom;
-        
+
         setTitle(chatRoom.toString());
 
         chatWindow = new JTextArea();
@@ -56,14 +57,15 @@ public class ChatGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String text = userName.getText() + ": " + enterText.getText();
-                
+
                 MessageClass message = new MessageClass(text, chatRoom);
-                
+
                 try {
-					out.writeObject(message);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+                    out.writeObject(message);
+                }
+                catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 enterText.setText("");
 
             }
@@ -102,12 +104,13 @@ public class ChatGUI extends JFrame {
 
     public void listenSocket() {
         try {
-            socket = new Socket("localhost", 446);
+            socket = new Socket("localhost", 4455);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
-            
-            //Send the initial connection message to the server giving the information about this particular chatroom
-            //specifically it's name
+
+            // Send the initial connection message to the server giving the information about this
+            // particular chatroom
+            // specifically it's name
             MessageClass initialMessage = new MessageClass(null, chatRoom);
             out.writeObject(initialMessage);
 

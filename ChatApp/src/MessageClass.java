@@ -1,15 +1,17 @@
 package src;
+
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
  */
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 
 /**
  * The class used to store data related to a message in a chat room.
  */
-public class MessageClass {
+public class MessageClass implements Serializable {
 
     /** The message itself. */
     String message;
@@ -19,7 +21,7 @@ public class MessageClass {
 
     /** The date and time at which the message was sent. */
     Date date;
-    
+
     Timestamp timestamp;
 
     /**

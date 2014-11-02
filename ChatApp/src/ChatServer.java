@@ -1,4 +1,5 @@
 package src;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,30 +8,35 @@ import java.util.ArrayList;
 public class ChatServer {
 
     ServerSocket server;
+    ServerSocket registerServer;
+    ServerSocket loginServer;
     Socket client;
     static ArrayList<ChatClientThread> clientWorkers = new ArrayList<ChatClientThread>();
 
+    public ChatServer() {
+    }
+
     public void listenSocket() {
         try {
-            server = new ServerSocket(444);
+            server = new ServerSocket(4455);
+            loginServer = new ServerSocket(4457);
+            registerServer = new ServerSocket(4459);
         }
         catch (IOException e) {
             System.out.println("Could not listen to port");
             System.exit(-1);
         }
 
-        while (true) {
-            ChatClientThread w;
-            try {
-                ChatClientThread ccl = new ChatClientThread(server.accept());
-                clientWorkers.add(ccl);
-                ccl.start();
-            }
-            catch (IOException e) {
-                System.out.println("Accept failed: 4444");
-                System.exit(-1);
-            }
-        }
+        LoginThread lt = new LoginThread(loginServer);
+        lt.start();
+
+        RegisterThread rt = new RegisterThread(registerServer);
+        rt.start();
+
+        ChatClientThread ccl = new ChatClientThread(server);
+        clientWorkers.add(ccl);
+        ccl.start();
+
     }
 
     public static ArrayList<ChatClientThread> getClientThreads() {
