@@ -38,6 +38,7 @@ public class SettingsClass extends JFrame implements ActionListener {
     JTextField questionField;
     JTextField answerField;
     UserClass user;
+    JTextField[] jFields;
 
     public SettingsClass(final UserClass user) {
         this.user = user;
@@ -66,8 +67,6 @@ public class SettingsClass extends JFrame implements ActionListener {
         center.add(this.questionField);
         center.add(answerLabel);
         center.add(this.answerField);
-
-        final JPanel east = new JPanel(new GridLayout(5, 1));
 
         final JButton okButton = new JButton("Ok");
         okButton.setActionCommand("Ok");

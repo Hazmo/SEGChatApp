@@ -195,17 +195,6 @@ class RegisterGUI extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this, "Your passwords do not match!");
             return false;
         }
-
-        // Go through each row in userData 2d array, check if student ID already exists
-        // within the array, if so, user cannot be created
-        // for (String[] row : userData) {
-        // if (row[0].equals(studentField.getText())) {
-        // JOptionPane.showMessageDialog(this,
-        // "Student ID already exists. Please try forgotten password option.");
-        // return false;
-        // }
-        // }
-
         return true;
     }
 
