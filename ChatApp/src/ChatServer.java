@@ -9,6 +9,7 @@ public class ChatServer {
 
     ServerSocket server;
     ServerSocket registerServer;
+    ServerSocket loginServer;
     Socket client;
     static ArrayList<ChatClientThread> clientWorkers = new ArrayList<ChatClientThread>();
 
@@ -18,12 +19,16 @@ public class ChatServer {
     public void listenSocket() {
         try {
             server = new ServerSocket(4455);
+            loginServer = new ServerSocket(4457);
             registerServer = new ServerSocket(4459);
         }
         catch (IOException e) {
             System.out.println("Could not listen to port");
             System.exit(-1);
         }
+
+        LoginThread lt = new LoginThread(loginServer);
+        lt.start();
 
         RegisterThread rt = new RegisterThread(registerServer);
         rt.start();

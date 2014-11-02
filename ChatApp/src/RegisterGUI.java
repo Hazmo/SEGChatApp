@@ -169,7 +169,14 @@ class RegisterGUI extends JFrame implements ActionListener {
             }
         }
         else if (e.getActionCommand().equals("cancelRegistration")) {
-            this.dispose();
+            try {
+                socket.close();
+                in.close();
+                out.close();
+            }
+            catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
