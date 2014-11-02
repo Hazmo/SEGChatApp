@@ -15,7 +15,6 @@ public class ChatClientThread extends Thread {
     String roomName = null;
 
     public ChatClientThread(ServerSocket server) {
-        System.out.println("Inside the ChatClientThread constructor");
         this.server = server;
 
     }

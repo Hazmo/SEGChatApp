@@ -79,11 +79,11 @@ public class StudentGUI extends JFrame {
      * Instantiates a new student class.
      */
     public StudentGUI(final UserClass user) {
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setSize(500, 600);
-        this.setLocationRelativeTo(null);
-        this.setLayout();
-        this.setVisible(true);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(500, 600);
+        setLocationRelativeTo(null);
+        setLayout();
+        setVisible(true);
         this.user = user;
     }
 
@@ -91,18 +91,18 @@ public class StudentGUI extends JFrame {
      * Sets the layout for the student GUI.
      */
     public void setLayout() {
-        this.setLayout(new BorderLayout(0, 20));
+        setLayout(new BorderLayout(0, 20));
 
         final JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.add(this.searchField, BorderLayout.CENTER);
-        searchPanel.add(this.searchButton, BorderLayout.EAST);
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(searchButton, BorderLayout.EAST);
 
-        this.searchButton.addActionListener(new SearchButtonListener());
+        searchButton.addActionListener(new SearchButtonListener());
 
         final JPanel northEastPanel = new JPanel(new FlowLayout());
-        this.settingsButton.addActionListener(new SettingsButtonListener());
-        northEastPanel.add(this.settingsButton);
-        northEastPanel.add(this.signoutButton);
+        settingsButton.addActionListener(new SettingsButtonListener());
+        northEastPanel.add(settingsButton);
+        northEastPanel.add(signoutButton);
 
         final JPanel northPanel = new JPanel(new BorderLayout(0, 20));
         northPanel.add(searchPanel, BorderLayout.CENTER);
@@ -115,48 +115,48 @@ public class StudentGUI extends JFrame {
 
         final DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        this.roomsTable.setDefaultRenderer(Object.class, centerRenderer);
-        this.roomsTable.setShowVerticalLines(false);
-        this.roomsTable.setModel(new DefaultTableModel(this.columnHeaders, 0) {
+        roomsTable.setDefaultRenderer(Object.class, centerRenderer);
+        roomsTable.setShowVerticalLines(false);
+        roomsTable.setModel(new DefaultTableModel(this.columnHeaders, 0) {
             @Override
             public boolean isCellEditable(final int row, final int column) {
                 return false;
             }
         });
-        this.roomsTable.addMouseListener(new TableMouseListener());
-        this.tableModel = (DefaultTableModel) this.roomsTable.getModel();
-        this.roomsTable.setRowHeight(20);
+        roomsTable.addMouseListener(new TableMouseListener());
+        tableModel = (DefaultTableModel) roomsTable.getModel();
+        roomsTable.setRowHeight(20);
         final TitledBorder tableTitle = new TitledBorder("Chat Rooms");
         tableTitle.setTitleJustification(TitledBorder.CENTER);
-        this.tableScrollPane.setBorder(tableTitle);
-        topicRoomsPanel.add(this.tableScrollPane);
+        tableScrollPane.setBorder(tableTitle);
+        topicRoomsPanel.add(tableScrollPane);
 
         /*
          * Adds all the topics to the model of the JList holding them and adds the topic to the
          * topics ArrayList. The lines that follow set up the list of topics.
          */
 
-        for (int i = 0; i < this.topics.length; i++) {
-            this.listModel.addElement(this.topics[i]);
-            this.topicsClasses.add(new TopicClass(this.topics[i]));
+        for (int i = 0; i < topics.length; i++) {
+            listModel.addElement(topics[i]);
+            topicsClasses.add(new TopicClass(topics[i]));
         }
-        this.topicsList.setModel(this.listModel);
+        topicsList.setModel(listModel);
         final TitledBorder listTitle = new TitledBorder("Topics List");
         listTitle.setTitleJustification(TitledBorder.CENTER);
-        this.topicsList.addListSelectionListener(new TopicsMouseSelectionListener());
-        this.topicsList.setLayoutOrientation(JList.VERTICAL);
-        this.topicsList.setFixedCellWidth(100);
-        this.topicsList.setBorder(listTitle);
-        topicRoomsPanel.add(this.listScrollPane, BorderLayout.WEST);
+        topicsList.addListSelectionListener(new TopicsMouseSelectionListener());
+        topicsList.setLayoutOrientation(JList.VERTICAL);
+        topicsList.setFixedCellWidth(100);
+        topicsList.setBorder(listTitle);
+        topicRoomsPanel.add(listScrollPane, BorderLayout.WEST);
 
         final JPanel southPanel = new JPanel(new FlowLayout());
-        this.createButton.addActionListener(new CreateButtonListener(this));
-        southPanel.add(this.createButton);
-        southPanel.add(this.refreshButton);
+        createButton.addActionListener(new CreateButtonListener(this));
+        southPanel.add(createButton);
+        southPanel.add(refreshButton);
 
-        this.add(northPanel, BorderLayout.NORTH);
-        this.add(topicRoomsPanel, BorderLayout.CENTER);
-        this.add(southPanel, BorderLayout.SOUTH);
+        add(northPanel, BorderLayout.NORTH);
+        add(topicRoomsPanel, BorderLayout.CENTER);
+        add(southPanel, BorderLayout.SOUTH);
     }
 
     /**
@@ -215,12 +215,18 @@ public class StudentGUI extends JFrame {
          * Method to add search results to the table
          */
         void appendTable(final ArrayList<ChatRoomClass> results) {
-            final DefaultTableModel tblResults = new DefaultTableModel(
-                    StudentGUI.this.columnHeaders, 0);
+            final DefaultTableModel tblResults = (new DefaultTableModel(columnHeaders, 0) {
+                @Override
+                public boolean isCellEditable(final int row, final int column) {
+                    return false;
+                }
+            });
+
             for (final ChatRoomClass cr : results) {
                 tblResults.addRow(cr.toArray());
             }
-            StudentGUI.this.roomsTable.setModel(tblResults);
+
+            roomsTable.setModel(tblResults);
         }
 
         @Override
@@ -271,8 +277,8 @@ public class StudentGUI extends JFrame {
         @Override
         public void mouseClicked(final MouseEvent e) {
             if (e.getClickCount() == 2) {
-                final int tableIndex = StudentGUI.this.roomsTable.getSelectedRow();
-                final String topicString = (String) StudentGUI.this.topicsList.getSelectedValue();
+                final int tableIndex = roomsTable.getSelectedRow();
+                final String topicString = (String) topicsList.getSelectedValue();
                 for (final TopicClass topic : StudentGUI.this.topicsClasses) {
                     if (topic.toString().equals(topicString)) {
                         final ChatRoomClass chatRoom = topic.getChatRooms().get(tableIndex);
@@ -366,7 +372,7 @@ public class StudentGUI extends JFrame {
             final String topicString = (String) StudentGUI.this.topicsList.getSelectedValue();
             for (final TopicClass topic : StudentGUI.this.topicsClasses) {
                 if (topic.topicName.equals(topicString)) {
-                    StudentGUI.this.roomsTable.setModel(topic.getTableModel());
+                    roomsTable.setModel(topic.getTableModel());
                 }
             }
         }
