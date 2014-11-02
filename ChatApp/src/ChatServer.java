@@ -13,7 +13,6 @@ public class ChatServer {
     static ArrayList<ChatClientThread> clientWorkers = new ArrayList<ChatClientThread>();
 
     public ChatServer() {
-        // getUserData();
     }
 
     public void listenSocket() {
@@ -35,7 +34,6 @@ public class ChatServer {
 
     }
 
- 
     public static ArrayList<ChatClientThread> getClientThreads() {
         return clientWorkers;
     }
