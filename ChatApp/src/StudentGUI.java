@@ -6,17 +6,30 @@ package src;
  */
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-
-import src.StudentGUI.TableMouseListener.RightClickMenu;
 
 /**
  * This class is used to create GUI displaying all available chat rooms in their respective topics,
@@ -102,6 +115,7 @@ public class StudentGUI extends JFrame {
         final JPanel northEastPanel = new JPanel(new FlowLayout());
         settingsButton.addActionListener(new SettingsButtonListener());
         northEastPanel.add(settingsButton);
+        signoutButton.addActionListener(new SignoutButtonListener());
         northEastPanel.add(signoutButton);
 
         final JPanel northPanel = new JPanel(new BorderLayout(0, 20));
@@ -166,6 +180,15 @@ public class StudentGUI extends JFrame {
      */
     public void addChatToList(final ChatRoomClass chat) {
         this.chatRooms.add(chat);
+    }
+
+    public class SignoutButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dispose();
+            new LoginGUI();
+        }
     }
 
     /**
