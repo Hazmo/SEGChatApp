@@ -11,8 +11,6 @@ public class ChatServer {
     ServerSocket registerServer;
     ServerSocket loginServer;
     ServerSocket settingsServer;
-    Socket client;
-    static ArrayList<ChatClientThread> clientWorkers = new ArrayList<ChatClientThread>();
 
     public ChatServer() {
     }
@@ -38,14 +36,9 @@ public class ChatServer {
         SettingsThread st = new SettingsThread(settingsServer);
         st.start();
 
-        ChatClientThread ccl = new ChatClientThread(server);
-        clientWorkers.add(ccl);
-        ccl.start();
+        MainChatThread mct = new MainChatThread(server);
+        mct.start();
 
-    }
-
-    public static ArrayList<ChatClientThread> getClientThreads() {
-        return clientWorkers;
     }
 
     public static void main(String args[]) {
