@@ -9,15 +9,12 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,20 +26,34 @@ import javax.swing.JTextField;
  */
 public class SettingsClass extends JFrame implements ActionListener {
 
-    /**
-     * Instantiates a new settings class and initiates all the GUI widgets / components.
-     */
     JTextField nameChangeField;
     JTextField passChangeField;
     JTextField confirmPassField;
     JTextField questionField;
     JTextField answerField;
-    UserClass user;
-    JTextField[] jFields;
 
+    UserClass user;
+
+    Socket socket;
+    ObjectOutputStream out;
+    ObjectInputStream in;
+
+    /**
+     * Instantiates a new settings class and initiates all the GUI widgets / components.
+     */
     public SettingsClass(final UserClass user) {
+
+        try {
+            socket = new Socket("localhost", 4456);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         this.user = user;
-        this.setLayout(new BorderLayout(15, 0));
+        setLayout(new BorderLayout(15, 0));
 
         final JLabel nameChangeLabel = new JLabel("Change name: ");
         final JLabel passChangeLabel = new JLabel("Change password: ");
@@ -50,23 +61,23 @@ public class SettingsClass extends JFrame implements ActionListener {
         final JLabel questionLabel = new JLabel("Change secret question: ");
         final JLabel answerLabel = new JLabel("Secret answer: ");
 
-        this.nameChangeField = new JTextField(20);
-        this.passChangeField = new JTextField(20);
-        this.confirmPassField = new JTextField(20);
-        this.questionField = new JTextField(20);
-        this.answerField = new JTextField(20);
+        nameChangeField = new JTextField(20);
+        passChangeField = new JTextField(20);
+        confirmPassField = new JTextField(20);
+        questionField = new JTextField(20);
+        answerField = new JTextField(20);
 
         final JPanel center = new JPanel(new GridLayout(5, 2));
         center.add(nameChangeLabel);
-        center.add(this.nameChangeField);
+        center.add(nameChangeField);
         center.add(passChangeLabel);
-        center.add(this.passChangeField);
+        center.add(passChangeField);
         center.add(confirmPassLabel);
-        center.add(this.confirmPassField);
+        center.add(confirmPassField);
         center.add(questionLabel);
-        center.add(this.questionField);
+        center.add(questionField);
         center.add(answerLabel);
-        center.add(this.answerField);
+        center.add(answerField);
 
         final JButton okButton = new JButton("Ok");
         okButton.setActionCommand("Ok");
@@ -79,106 +90,75 @@ public class SettingsClass extends JFrame implements ActionListener {
         south.add(okButton);
         south.add(cancelButton);
 
-        this.add(center);
-        this.add(south, BorderLayout.SOUTH);
+        add(center);
+        add(south, BorderLayout.SOUTH);
 
-        this.setVisible(true);
-        this.pack();
+        setVisible(true);
+        pack();
     }
 
     @Override
     public void actionPerformed(final ActionEvent e) {
         if ((e.getActionCommand()).equals("Cancel")) {
-            this.dispose();
+            try {
+                socket.close();
+                in.close();
+                out.close();
+            }
+            catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            dispose();
         }
         else {
             if (e.getActionCommand().equals("Ok")) {
-                final File csvFile = new File("users.csv");
-                final File tempFile = new File("temp.csv");
-
-                String line = "";
-                final String splitBy = ",";
-                BufferedReader br = null;
-                PrintWriter pw = null;
+                int confirmation = 0;
+                JTextField[] jFields = { nameChangeField, passChangeField, confirmPassField,
+                        questionField, answerField };
 
                 try {
-                    br = new BufferedReader(new FileReader(csvFile));
-                    pw = new PrintWriter(new FileWriter(tempFile));
-
-                    while ((line = br.readLine()) != null) {
-                        final String[] temp = line.split(splitBy);
-                        if (temp[1].equals(this.user.getID())) {
-                            continue;
-                        }
-                        pw.println(line);
-                    }
-
-                    pw.print("0");
-                    pw.print(",");
-                    pw.print(this.user.getID());
-                    pw.print(",");
-
-                    if (!this.nameChangeField.getText().equals("")) {
-                        pw.print(this.nameChangeField.getText());
-                        this.user.setName(this.nameChangeField.getText());
-                    }
-                    else {
-                        pw.print(this.user.getName());
-                    }
-
-                    pw.print(",");
-                    if (!(this.passChangeField.getText().equals(""))) {
-                        if (this.passChangeField.getText().equals(this.confirmPassField.getText())) {
-                            pw.print(this.passChangeField.getText());
-                            this.user.setPassword(this.passChangeField.getText());
-                        }
-                        else {
-                            JOptionPane.showMessageDialog(this, "Password fields don't match!");
-                            this.passChangeField.setText("");
-                            this.confirmPassField.setText("");
-                        }
-                    }
-                    else {
-                        pw.print(this.user.getPassword());
-                    }
-
-                    pw.print(",");
-                    if (!this.questionField.getText().equals("")) {
-                        pw.print(this.questionField.getText());
-                        this.user.setQuestion(this.questionField.getText());
-                    }
-                    else {
-                        pw.print(this.user.getQuestion());
-                    }
-
-                    pw.print(",");
-                    if (!this.answerField.getText().equals("")) {
-                        pw.print(this.answerField.getText());
-                        this.user.setAnswer(this.answerField.getText());
-                    }
-                    else {
-                        pw.print(this.user.getAnswer());
-                    }
-                    pw.println();
-
+                    System.out.println(jFields[0].getText());
+                    out.writeObject(jFields);
+                    out.writeObject(user);
+                    confirmation = (int) in.readObject();
                 }
-                catch (final Exception ex) {
-                    ex.printStackTrace();
+                catch (Exception e1) {
+                    e1.printStackTrace();
+                    confirmation = 3;
                 }
-                finally {
-                    try {
-                        br.close();
-                    }
-                    catch (final IOException e1) {
-                        e1.printStackTrace();
-                    }
-                    pw.close();
-                }
-                csvFile.delete();
-                tempFile.renameTo(new File("users.csv"));
 
+                switch (confirmation) {
+                case (1): {
+                    JOptionPane.showMessageDialog(this, "Information updated!");
+                    this.dispose();
+                    break;
+                }
+
+                case (2): {
+                    JOptionPane.showMessageDialog(this,
+                            "Update failed! Problem with the user database!");
+                    this.dispose();
+                    break;
+                }
+
+                case (3): {
+                    JOptionPane.showMessageDialog(this,
+                            "Update failed, problem with connection to server!");
+                    this.dispose();
+                    break;
+                }
+                }
+
+                this.dispose();
+                try {
+                    socket.close();
+                    in.close();
+                    out.close();
+                }
+                catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
-            this.dispose();
         }
     }
 }

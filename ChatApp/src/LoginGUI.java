@@ -80,7 +80,7 @@ public class LoginGUI extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                try (Socket login = new Socket("localhost", 4457);
+                try (Socket login = new Socket("localhost", 4455);
                         PrintWriter out = new PrintWriter(login.getOutputStream(), true);
                         ObjectInputStream in = new ObjectInputStream(login.getInputStream());) {
                     out.println(studentIDField.getText());

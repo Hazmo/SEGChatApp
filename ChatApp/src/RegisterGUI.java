@@ -162,9 +162,20 @@ class RegisterGUI extends JFrame implements ActionListener {
                 case (4): {
                     JOptionPane.showMessageDialog(this,
                             "Registration failed, this ID has already been registered!");
+
                     this.dispose();
+
                     break;
                 }
+                }
+
+                try {
+                    socket.close();
+                    in.close();
+                    out.close();
+                }
+                catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
         }

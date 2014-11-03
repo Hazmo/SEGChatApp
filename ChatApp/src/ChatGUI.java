@@ -104,7 +104,7 @@ public class ChatGUI extends JFrame {
 
     public void listenSocket() {
         try {
-            socket = new Socket("localhost", 4455);
+            socket = new Socket("localhost", 4454);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
 
