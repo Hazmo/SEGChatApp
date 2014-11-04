@@ -1,4 +1,5 @@
 package src;
+
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
@@ -127,7 +128,7 @@ public class CreateChatDialog extends JFrame {
             String chatRoomDescription = descriptionArea.getText();
             String[] rowData = { chatRoomName, "0", chatRoomDescription };
 
-            ChatRoomClass chatRoom = new ChatRoomClass(chatRoomName, chatRoomDescription);
+            ChatRoomClass chatRoom = new ChatRoomClass(topicName, chatRoomName, chatRoomDescription);
             studentFrame.addChatToList(chatRoom);
 
             for (TopicClass topic : studentFrame.topicsClasses) {

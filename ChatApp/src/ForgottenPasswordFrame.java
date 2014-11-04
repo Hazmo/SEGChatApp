@@ -139,7 +139,6 @@ class ForgottenPasswordFrame extends JFrame implements ActionListener {
                     questionLabel.setText("Question: ");
                     JOptionPane.showMessageDialog(this, "This ID has not been registered!");
                 }
-
             }
             catch (Exception ex) {
                 ex.printStackTrace();
