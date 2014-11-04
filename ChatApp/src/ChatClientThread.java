@@ -38,7 +38,6 @@ public class ChatClientThread extends Thread {
                 System.out.println(e.getMessage());
                 System.out.println("I/O failed.");
                 System.exit(-1);
-
             }
             catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
@@ -49,6 +48,7 @@ public class ChatClientThread extends Thread {
 
                 try {
                     message = (MessageClass) in.readObject();
+
                     for (ChatClientThread thread : MainChatThread.getClientThreads()) {
                         if (message.getRoomName().equals(thread.getRoomName())) {
                             thread.sendMessage(message);
@@ -59,13 +59,11 @@ public class ChatClientThread extends Thread {
                 catch (IOException e) {
                     System.out.println("Read failed.");
                     System.exit(-1);
-
                 }
                 catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
             }
         }
 

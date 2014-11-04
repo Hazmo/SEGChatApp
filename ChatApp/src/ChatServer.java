@@ -2,8 +2,6 @@ package src;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
 
 public class ChatServer {
 
@@ -12,6 +10,7 @@ public class ChatServer {
     ServerSocket loginServer;
     ServerSocket settingsServer;
     ServerSocket forgottenServer;
+    ServerSocket topicsServer;
 
     public ChatServer() {
     }
@@ -29,8 +28,10 @@ public class ChatServer {
             settingsServer = new ServerSocket(4456);
             ok = 4457;
             forgottenServer = new ServerSocket(4457);
-        }
-        catch (IOException e) {
+            ok = 4458;
+            topicsServer = new ServerSocket(4458);
+
+        } catch (IOException e) {
             System.out.println("Could not listen to port " + ok);
             System.exit(-1);
         }
@@ -47,11 +48,12 @@ public class ChatServer {
         ForgottenPassThread fpt = new ForgottenPassThread(forgottenServer);
         fpt.start();
 
+        TopicsServerThread tt = new TopicsServerThread(topicsServer);
+        tt.start();
+
         MainChatThread mct = new MainChatThread(server);
         mct.start();
-
     }
-
     public static void main(String args[]) {
         ChatServer cs = new ChatServer();
         cs.listenSocket();

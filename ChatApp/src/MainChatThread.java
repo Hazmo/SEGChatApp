@@ -16,7 +16,6 @@ public class MainChatThread extends Thread {
         this.server = server;
 
     }
-
     @Override
     public void run() {
         ChatClientThread ccl;
@@ -26,8 +25,7 @@ public class MainChatThread extends Thread {
                 clientWorkers.add(ccl);
                 ccl.start();
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
