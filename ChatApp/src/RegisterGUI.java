@@ -9,6 +9,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,6 +60,7 @@ class RegisterGUI extends JFrame implements ActionListener {
             e.printStackTrace();
         }
 
+        setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setTitle("REGISTRATION FORM");
 
         JPanel center = new JPanel(new GridLayout(6, 1, 10, 10));
@@ -110,6 +113,19 @@ class RegisterGUI extends JFrame implements ActionListener {
         cancelButton.setActionCommand("cancelRegistration");
         submitButton.addActionListener(this);
         cancelButton.addActionListener(this);
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try {
+                    socket.close();
+                    in.close();
+                    out.close();
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         setResizable(false);
         pack();

@@ -11,6 +11,7 @@ public class ChatServer {
     ServerSocket registerServer;
     ServerSocket loginServer;
     ServerSocket settingsServer;
+    ServerSocket forgottenServer;
     Socket client;
     static ArrayList<ChatClientThread> clientWorkers = new ArrayList<ChatClientThread>();
 
@@ -18,14 +19,21 @@ public class ChatServer {
     }
 
     public void listenSocket() {
+        int ok = 0;
         try {
+            ok = 4454;
             server = new ServerSocket(4454);
+            ok = 4455;
             loginServer = new ServerSocket(4455);
+            ok = 4459;
             registerServer = new ServerSocket(4459);
+            ok = 4456;
             settingsServer = new ServerSocket(4456);
+            ok = 4457;
+            forgottenServer = new ServerSocket(4457);
         }
         catch (IOException e) {
-            System.out.println("Could not listen to port");
+            System.out.println("Could not listen to port " + ok);
             System.exit(-1);
         }
 
@@ -37,6 +45,9 @@ public class ChatServer {
 
         SettingsThread st = new SettingsThread(settingsServer);
         st.start();
+
+        ForgottenPassThread fpt = new ForgottenPassThread(forgottenServer);
+        fpt.start();
 
         ChatClientThread ccl = new ChatClientThread(server);
         clientWorkers.add(ccl);

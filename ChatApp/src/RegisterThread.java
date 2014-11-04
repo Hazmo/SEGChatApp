@@ -30,10 +30,9 @@ public class RegisterThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            try {
-                Socket s = registerServer.accept();
-                ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+            try (Socket s = registerServer.accept();
+                    ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+                    ObjectInputStream in = new ObjectInputStream(s.getInputStream());) {
                 jFields = (JTextField[]) in.readObject();
                 try {
                     getUserData();

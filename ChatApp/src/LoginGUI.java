@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
@@ -115,6 +117,11 @@ public class LoginGUI extends JFrame {
         });
 
         // setting the listener for using the security question
-        forgottenPassLabel.addMouseListener(new SecurityListener());
+        forgottenPassLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new ForgottenPasswordFrame();
+            }
+        });
     }
 }
