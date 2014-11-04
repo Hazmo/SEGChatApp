@@ -13,46 +13,38 @@ import java.util.ArrayList;
  */
 public class TopicsServerThread extends Thread {
 
-    ArrayList<TopicClass> topics = new ArrayList<TopicClass>();
-    DefaultListModel topicsModel = new DefaultListModel();
+    static ArrayList<TopicClass> topics = new ArrayList<TopicClass>();
+    static DefaultListModel topicsModel = new DefaultListModel();
     ServerSocket server;
 
     TopicsServerThread(ServerSocket server) {
         this.server = server;
-
-        TopicClass t = new TopicClass("Hello");
-        ChatRoomClass c = new ChatRoomClass("hello", "hello");
-        t.addChatRoom(c);
-        t.addRow(c);
-
-        topics.add(t);
-        topicsModel.addElement("Hello");
     }
 
     public void run() {
-        while (true) {
-            try (Socket s = server.accept();
-                 ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-                 ObjectInputStream in = new ObjectInputStream(s.getInputStream());) {
-                System.out.println("Reached");
-                MessageClass message = (MessageClass) in.readObject();
-                System.out.println(message.getMessage());
-
-                if(message.getMessageType().equals("get_topics")) {
-                    out.writeObject(topics);
-                    out.writeObject(topicsModel);
-                }
-
-                else if(message.getMessageType().equals("send_topics")) {
-                    ArrayList<TopicClass> topicsSent = (ArrayList<TopicClass>) in.readObject();
-                    topics = topicsSent;
-                }
-
+        while(true) {
+            try {
+                TopicsThread tt = new TopicsThread(server.accept());
+                tt.start();
             } catch (IOException e) {
-
-            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static ArrayList<TopicClass> getTopics() {
+        return topics;
+    }
+
+    public static DefaultListModel getTopicsModel() {
+        return topicsModel;
+    }
+
+    public static void setTopics(ArrayList<TopicClass> topicsSent) {
+        topics = topicsSent;
+    }
+
+    public static void setTopicsModel(DefaultListModel topicsModelSent) {
+        topicsModel = topicsModelSent;
     }
 }
