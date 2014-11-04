@@ -4,6 +4,8 @@ package src;
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
  */
+import sun.plugin2.message.Message;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -12,6 +14,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -90,6 +96,12 @@ public class StudentGUI extends JFrame {
 
     UserClass user;
 
+    Socket s;
+
+    ObjectOutputStream out;
+
+    ObjectInputStream in;
+
     /**
      * Instantiates a new student class.
      */
@@ -106,6 +118,15 @@ public class StudentGUI extends JFrame {
      * Sets the layout for the student GUI.
      */
     public void setLayout() {
+
+        try {
+            s = new Socket("localhost", 4458);
+            out = new ObjectOutputStream(s.getOutputStream());
+            in = new ObjectInputStream(s.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(0, 20));
 
@@ -169,20 +190,30 @@ public class StudentGUI extends JFrame {
         final JPanel southPanel = new JPanel(new FlowLayout());
         createButton.addActionListener(new CreateButtonListener(this));
         southPanel.add(createButton);
+        refreshButton.addActionListener(new RefreshButtonListener(this));
         southPanel.add(refreshButton);
 
         add(northPanel, BorderLayout.NORTH);
         add(topicRoomsPanel, BorderLayout.CENTER);
         add(southPanel, BorderLayout.SOUTH);
+
     }
 
     /**
      * Adds the new chatroom to the chatroom ArrayList
      * @param ChatRoomClass
-     * @see CreateChatDialog
+     * @see src.CreateChatDialog
      */
     public void addChatToList(final ChatRoomClass chat) {
         this.chatRooms.add(chat);
+    }
+
+    public void setTopicsArrayList(ArrayList<TopicClass> topics) {
+        this.topicsClasses = topics;
+    }
+
+    public void setTopicsJListModel(DefaultListModel topicsModel) {
+        topicsList.setModel(topicsModel);
     }
 
     public class SignoutButtonListener implements ActionListener {
@@ -278,7 +309,7 @@ public class StudentGUI extends JFrame {
     /**
      * The listener interface for receiving events in the settings button. Opens up a new frame
      * containing the user settings when the button is pressed.
-     * @see SettingsClass
+     * @see src.SettingsClass
      */
     public class SettingsButtonListener implements ActionListener {
 
@@ -295,8 +326,8 @@ public class StudentGUI extends JFrame {
      * The listener interface for receiving events in the chat rooms table. It gets the table row
      * that is selected, using this to get the chat room object from the topics class and using this
      * to open the chat GUI.
-     * @see TopicClass
-     * @see ChatRoomClass
+     * @see src.TopicClass
+     * @see src.ChatRoomClass
      */
     public class TableMouseListener extends MouseAdapter {
 
@@ -389,17 +420,41 @@ public class StudentGUI extends JFrame {
      * The listener used for receiving events from the topics list. Listens for a selection in the
      * topics list: if it detects an event, it will update the rooms table with all the chat rooms
      * from the selected topic.
-     * @see ListSelectionEvent
+     * @see javax.swing.event.ListSelectionEvent
      */
     public class TopicsMouseSelectionListener implements ListSelectionListener {
 
         @Override
         public void valueChanged(final ListSelectionEvent e) {
             final String topicString = (String) StudentGUI.this.topicsList.getSelectedValue();
+            System.out.println(topicString);
             for (final TopicClass topic : StudentGUI.this.topicsClasses) {
+                System.out.println(topic.toString());
                 if (topic.topicName.equals(topicString)) {
                     roomsTable.setModel(topic.getTableModel());
                 }
+            }
+        }
+    }
+
+    public class RefreshButtonListener implements ActionListener {
+
+        StudentGUI ui;
+
+        public RefreshButtonListener(StudentGUI ui) {
+            this.ui = ui;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                ui.out.writeObject(new MessageClass(null, "get_topics"));
+                ui.setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
+                ui.setTopicsJListModel((DefaultListModel) in.readObject());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();
             }
         }
     }

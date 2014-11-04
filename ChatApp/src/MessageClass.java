@@ -23,6 +23,8 @@ public class MessageClass implements Serializable {
     Date date;
 
     Timestamp timestamp;
+    //The type of the message being sent.
+    String messageType;
 
     /**
      * Instantiates a new message class.
@@ -37,6 +39,13 @@ public class MessageClass implements Serializable {
         date = new Date();
         timestamp = new Timestamp(date.getTime());
 
+    }
+
+    public MessageClass(String message, String messageType) {
+        this.message = message;
+        date = new Date();
+        timestamp = new Timestamp(date.getTime());
+        this.messageType = messageType;
     }
 
     /**
@@ -61,5 +70,9 @@ public class MessageClass implements Serializable {
      */
     public String getTimestamp() {
         return date.toString();
+    }
+
+    public String getMessageType() {
+        return messageType;
     }
 }

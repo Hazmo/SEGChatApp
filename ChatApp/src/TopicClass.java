@@ -3,6 +3,7 @@ package src;
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
  */
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.table.DefaultTableModel;
@@ -10,7 +11,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  * The class used to store data related to a topic.
  */
-public class TopicClass {
+public class TopicClass implements Serializable {
 
     /** The topic name. */
     String topicName;
