@@ -4,7 +4,7 @@ package src;
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
  */
-import sun.plugin2.message.Message;
+//import sun.plugin2.message.Message;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -376,7 +376,7 @@ public class StudentGUI extends JFrame {
                     if (topic.toString().equals(topicString)) {
                         for (ChatRoomClass chatRoom : topic.getChatRooms()) {
                             if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
-                                new ChatGUI(chatRoom);
+                                new ChatGUI(chatRoom, StudentGUI.this.user);
                                 break;
                             }
 

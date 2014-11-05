@@ -1,19 +1,22 @@
 package src;
-import java.io.BufferedReader;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import javax.swing.JTextArea;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 
 
 public class MessageThread extends Thread{
 	
 	ObjectInputStream in;
-	JTextArea ta;
+	JList ta;
+	DefaultListModel<String> lm;
 	
-	public MessageThread(ObjectInputStream in, JTextArea ta) {
+	public MessageThread(ObjectInputStream in, JList ta, DefaultListModel<String> lm) {
 		this.in = in;
 		this.ta = ta;
+		this.lm = lm;
 		
 	}
 	
@@ -25,7 +28,8 @@ public class MessageThread extends Thread{
 			try {			
 				
 				MessageClass message = (MessageClass) in.readObject();
-				ta.append(message.getMessage() + "\n");
+				lm.addElement(message.getMessage());
+				ta.setModel(lm);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
