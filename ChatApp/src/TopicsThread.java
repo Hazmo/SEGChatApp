@@ -43,5 +43,9 @@ public class TopicsThread extends Thread {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 }

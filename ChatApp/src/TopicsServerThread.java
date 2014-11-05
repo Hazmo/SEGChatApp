@@ -13,16 +13,24 @@ import java.util.ArrayList;
  */
 public class TopicsServerThread extends Thread {
 
+    String initialTopics[] = {"Informatics", "Mathematics"};
+
     static ArrayList<TopicClass> topics = new ArrayList<TopicClass>();
     static DefaultListModel topicsModel = new DefaultListModel();
     ServerSocket server;
 
     TopicsServerThread(ServerSocket server) {
         this.server = server;
-        topics.add(new TopicClass("Informatics"));
-        topicsModel.addElement("Informatics");
-        topics.add(new TopicClass("Mathematics"));
-        topicsModel.addElement("Mathematics");
+
+
+        setUpInitialTopics();
+    }
+
+    private void setUpInitialTopics() {
+        for(String topicName : initialTopics) {
+            topics.add(new TopicClass(topicName));
+            topicsModel.addElement(topicName);
+        }
     }
 
     public void run() {
