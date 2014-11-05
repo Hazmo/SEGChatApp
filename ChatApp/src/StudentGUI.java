@@ -233,7 +233,7 @@ public class StudentGUI extends JFrame {
 
     public void sendTopicsToServer(ArrayList<TopicClass> topics, DefaultListModel topicsListModel) {
         try {
-            out.writeObject(new MessageClass(null, "send_topics"));
+            out.writeObject(new MessageClass("send_topics", "whatever"));
             out.writeObject(topics);
             out.writeObject(topicsListModel);
         } catch(IOException e) {
@@ -242,7 +242,7 @@ public class StudentGUI extends JFrame {
     }
 
     public void getTopicsFromServer() throws IOException, ClassNotFoundException {
-        out.writeObject(new MessageClass(null, "get_topics"));
+        out.writeObject(new MessageClass("get_topics", "whatever"));
         setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
         setTopicsJListModel((DefaultListModel) in.readObject());
     }

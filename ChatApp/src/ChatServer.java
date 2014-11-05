@@ -30,7 +30,7 @@ public class ChatServer {
             ok = 4458;
             topicsServer = new ServerSocket(4458);
 
-            registerServer = new ServerSocket(4459);
+            //registerServer = new ServerSocket(4459);
 
         } catch (IOException e) {
             System.out.println("Could not listen to port " + ok);

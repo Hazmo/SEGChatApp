@@ -102,6 +102,7 @@ public class LoginGUI extends JFrame {
 
                     if (loginConfirm.getMessage().equals("true")) {
                         UserClass user = (UserClass) in.readObject();
+
                         new StudentGUI(user);
                         dispose();
                     }
