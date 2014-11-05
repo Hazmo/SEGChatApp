@@ -13,6 +13,7 @@ import java.util.Date;
  */
 public class MessageClass implements Serializable {
 
+    private final Object[] extraData;
     /** The message itself. */
     String message;
 
@@ -34,18 +35,34 @@ public class MessageClass implements Serializable {
      *        the chat room in which the message was sent
      */
     public MessageClass(String message, ChatRoomClass chatRoom) {
-        this.message = message;
-        this.chatRoom = chatRoom;
-        date = new Date();
-        timestamp = new Timestamp(date.getTime());
+        this(null, chatRoom, message, null);
 
     }
 
+    /*
     public MessageClass(String message, String messageType) {
         this.message = message;
         date = new Date();
         timestamp = new Timestamp(date.getTime());
         this.messageType = messageType;
+    }
+    */
+
+    public MessageClass(String messageType, ChatRoomClass chatRoom, String message, Object[] extraData) {
+        this.messageType = messageType;
+        this.message = message;
+        this.chatRoom = chatRoom;
+        this.extraData = extraData;
+        date = new Date();
+        timestamp = new Timestamp(date.getTime());
+    }
+
+    public MessageClass(String messageType, String message) {
+        this(messageType, null, message, null);
+    }
+
+    public MessageClass(String messageType, String message, Object[] extraData) {
+        this(messageType, null, message, extraData);
     }
 
     /**
@@ -74,5 +91,9 @@ public class MessageClass implements Serializable {
 
     public String getMessageType() {
         return messageType;
+    }
+
+    public Object[] getExtraData() {
+        return extraData;
     }
 }
