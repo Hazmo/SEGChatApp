@@ -19,6 +19,10 @@ public class TopicsServerThread extends Thread {
 
     TopicsServerThread(ServerSocket server) {
         this.server = server;
+        topics.add(new TopicClass("Informatics"));
+        topicsModel.addElement("Informatics");
+        topics.add(new TopicClass("Mathematics"));
+        topicsModel.addElement("Mathematics");
     }
 
     public void run() {
