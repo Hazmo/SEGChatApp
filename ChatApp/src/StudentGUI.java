@@ -204,13 +204,8 @@ public class StudentGUI extends JFrame {
         add(topicRoomsPanel, BorderLayout.CENTER);
         add(southPanel, BorderLayout.SOUTH);
 
-        try {
-            getTopicsFromServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        getTopicsFromServer();
+
 
     }
 
@@ -236,15 +231,23 @@ public class StudentGUI extends JFrame {
             out.writeObject(new MessageClass("send_topics", "whatever"));
             out.writeObject(topics);
             out.writeObject(topicsListModel);
+            getTopicsFromServer();
         } catch(IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void getTopicsFromServer() throws IOException, ClassNotFoundException {
-        out.writeObject(new MessageClass("get_topics", "whatever"));
-        setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
-        setTopicsJListModel((DefaultListModel) in.readObject());
+    public void getTopicsFromServer() {
+        try {
+            out.writeObject(new MessageClass("get_topics", "whatever"));
+            setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
+            setTopicsJListModel((DefaultListModel) in.readObject());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public class SignoutButtonListener implements ActionListener {
@@ -483,13 +486,7 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                ui.getTopicsFromServer();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (ClassNotFoundException e1) {
-                e1.printStackTrace();
-            }
+            ui.getTopicsFromServer();;
         }
     }
 }

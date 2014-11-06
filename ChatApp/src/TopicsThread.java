@@ -13,9 +13,11 @@ import java.util.ArrayList;
 public class TopicsThread extends Thread {
 
     Socket s;
+    TopicsServerThread server;
 
-    public TopicsThread(Socket s) {
+    public TopicsThread(TopicsServerThread server, Socket s) {
         this.s = s;
+        this.server = server;
     }
 
     public void run() {
@@ -28,13 +30,13 @@ public class TopicsThread extends Thread {
                 MessageClass message = (MessageClass) in.readObject();
 
                 if (message.getMessageType().equals("get_topics")) {
-                    out.writeObject(TopicsServerThread.getTopics());
-                    out.writeObject(TopicsServerThread.getTopicsModel());
+                    out.writeObject(server.getTopics());
+                    out.writeObject(server.getTopicsModel());
 
                 } else if (message.getMessageType().equals("send_topics")) {
 
-                    TopicsServerThread.setTopics((ArrayList<TopicClass>) in.readObject());
-                    TopicsServerThread.setTopicsModel((DefaultListModel) in.readObject());
+                    server.setTopics((ArrayList<TopicClass>) in.readObject());
+                    server.setTopicsModel((DefaultListModel) in.readObject());
                 }
             }
 
