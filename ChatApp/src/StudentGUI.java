@@ -379,15 +379,13 @@ public class StudentGUI extends JFrame {
                     if (topic.toString().equals(topicString)) {
                         for (ChatRoomClass chatRoom : topic.getChatRooms()) {
                             if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
-                                new ChatGUI(chatRoom, StudentGUI.this.user);
+                                new ChatGUI(chatRoom, user);
                                 break;
                             }
-
                         }
                         break;
                     }
                 }
-
             }
         }
 

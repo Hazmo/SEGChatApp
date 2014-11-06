@@ -31,7 +31,8 @@ public class UserData {
 
     public boolean loginUser(String studentID, String password) {
         getUserDataLogIn();
-
+        this.studentID = studentID;
+        this.password = password;
         for (String[] row : userDataLogIn) {
             if (row[1].equals(studentID) && row[3].equals(password)) {
                 String[] userTmp = getUser();
@@ -53,6 +54,7 @@ public class UserData {
                 userInf[3] = row[3];
                 userInf[4] = row[4];
                 userInf[5] = row[5];
+
                 return userInf;
             }
         }
@@ -214,5 +216,9 @@ public class UserData {
             }
         }
         return userDataRegister;
+    }
+
+    public UserClass getUserClass() {
+        return user;
     }
 }

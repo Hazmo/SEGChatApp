@@ -49,9 +49,12 @@ public class RegisterLoginThread extends Thread{
                     System.out.println("password = " + password);
 
                     boolean loggedIn = userData.loginUser(studentID, password);
+
+
                     System.out.println("Boolean.toString(loggedIn) = " + Boolean.toString(loggedIn));
                     out.writeObject(new MessageClass("logged_in", Boolean.toString(loggedIn)));
                     if (loggedIn) {
+                        user = userData.getUserClass();
                         out.writeObject(user);
                     }
 
