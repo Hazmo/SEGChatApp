@@ -2,17 +2,12 @@ package src;
 
 import javax.swing.*;
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Created by Harry on 05/11/2014.
+ * Created by Harry on 06/11/2014.
  */
-public class RegisterLoginThread extends Thread{
-
-    Socket s;
+public class UserData {
 
     String[][] userDataLogIn;
     String studentID;
@@ -26,80 +21,16 @@ public class RegisterLoginThread extends Thread{
     static boolean ok = false;
 
 
-    UserData userData = new UserData("users.csv");
+    File userDataFile;
 
-    public RegisterLoginThread(Socket s) {
-        this.s = s;
-    }
-
-    public void run() {
-        try (
-                ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-                ObjectInputStream in = new ObjectInputStream(s.getInputStream());) {
-
-            while (true) {
-
-                MessageClass message = (MessageClass) in.readObject();
-
-                if (message.getMessageType().equals("log_in")) {
-
-                    studentID = message.getMessage();
-                    password = (String) message.getExtraData()[0];
-                    System.out.println("studentID = " + studentID);
-                    System.out.println("password = " + password);
-
-                    boolean loggedIn = userData.loginUser(studentID, password);
-                    System.out.println("Boolean.toString(loggedIn) = " + Boolean.toString(loggedIn));
-                    out.writeObject(new MessageClass("logged_in", Boolean.toString(loggedIn)));
-                    if (loggedIn) {
-                        out.writeObject(user);
-                    }
-
-
-                } else if (message.getMessageType().equals("register")) {
-                    jFields = (JTextField[]) message.getExtraData();
-                    try {
-                        userDataRegister = userData.getUserDataRegister();
-                        ok = true;
-                    }
-                    catch (Exception e) {
-                        ok = false;
-                    }
-                    if (ok == true) {
-                        boolean duplicate = false;
-                        for (int i = 0; i < userDataRegister.length; i++) {
-                            if (userDataRegister[i][0].equals(jFields[1].getText())) {
-                                duplicate = true;
-                                break;
-                            }
-                        }
-                        if (duplicate == true) {
-                            out.writeObject(4);
-                        }
-                        else {
-                            int registered = userData.registerUser(jFields);
-                            out.writeObject(registered);
-                        }
-                    }
-                    else {
-                        int registered = userData.registerUser(jFields);
-                        out.writeObject(registered);
-                        ok = true;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.getMessage();
-        } catch (ClassNotFoundException e) {
-            e.getMessage();
-        }
+    public UserData(String file) {
+        userDataFile = new File(file);
     }
 
 
-    /**
 
     public boolean loginUser(String studentID, String password) {
-        userDataLogIn = userData.getUserDataLogIn();
+        getUserDataLogIn();
 
         for (String[] row : userDataLogIn) {
             if (row[1].equals(studentID) && row[3].equals(password)) {
@@ -129,8 +60,8 @@ public class RegisterLoginThread extends Thread{
     }
 
 
-    public void getUserDataLogIn() {
-        users = new File("users.csv");
+    public String[][] getUserDataLogIn() {
+        users = userDataFile;
 
         int count = 0;
         Scanner sc;
@@ -184,9 +115,11 @@ public class RegisterLoginThread extends Thread{
                 }
             }
         }
+
+        return userDataLogIn;
     }
 
-    public int registerUser() {
+    public int registerUser(JTextField jFields[]) {
         FileWriter registrationFileWriter = null;
         try {
             registrationFileWriter = new FileWriter("users.csv", true);
@@ -224,13 +157,9 @@ public class RegisterLoginThread extends Thread{
         return 1;
     }
 
-    /**
-     * Method to get the data from the users csv file
-     */
 
-    /*
-    public void getUserDataRegister() {
-        users = new File("users.csv");
+    public String[][] getUserDataRegister() {
+        users = userDataFile;
 
         int count = 0;
         Scanner sc;
@@ -265,6 +194,8 @@ public class RegisterLoginThread extends Thread{
                 userDataRegister[count2][3] = temp[5];
                 count2++;
             }
+
+
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -282,8 +213,6 @@ public class RegisterLoginThread extends Thread{
                 }
             }
         }
+        return userDataRegister;
     }
-    */
-
-
 }

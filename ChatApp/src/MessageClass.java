@@ -34,10 +34,7 @@ public class MessageClass implements Serializable {
      * @param chatRoom
      *        the chat room in which the message was sent
      */
-    public MessageClass(String message, ChatRoomClass chatRoom) {
-        this(null, chatRoom, message, null);
 
-    }
 
     /*
     public MessageClass(String message, String messageType) {
@@ -63,6 +60,11 @@ public class MessageClass implements Serializable {
 
     public MessageClass(String messageType, String message, Object[] extraData) {
         this(messageType, null, message, extraData);
+    }
+
+    public MessageClass(String message, ChatRoomClass chatRoom) {
+        this(null, chatRoom, message, null);
+
     }
 
     /**
