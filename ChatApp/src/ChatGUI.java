@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -11,13 +13,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class ChatGUI extends JFrame {
 
@@ -25,79 +35,85 @@ public class ChatGUI extends JFrame {
     ObjectOutputStream out;
     ObjectInputStream in;
 
-    JTextArea chatWindow;
-    JScrollPane jsp;
+    JList chatWindow = new JList();
+    DefaultListModel<String> chatModel = new DefaultListModel<String>();
+    JScrollPane jsp = new JScrollPane(chatWindow);
+
+    JList userWindow = new JList();
+    DefaultListModel<String> userModel = new DefaultListModel<String>();
+    JScrollPane jsp2 = new JScrollPane(userWindow);
+
+    JTextField enterText = new JTextField();
+    JButton send = new JButton("Send");
+
+    UserClass user;
+
     JTextField userName;
-    JTextField enterText;
-    JButton send;
     JButton quit;
 
     JPanel jp;
 
     ChatRoomClass chatRoom;
 
-    public ChatGUI(final ChatRoomClass chatRoom) {
+    public ChatGUI(final ChatRoomClass chatRoom, UserClass user) {
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         this.chatRoom = chatRoom;
+        this.user = user;
 
         setTitle(chatRoom.toString());
+        chatWindow.setModel(chatModel);
 
-        chatWindow = new JTextArea();
-        jsp = new JScrollPane(chatWindow);
+        userWindow.setModel(userModel);
+        userModel.addElement(user.getName());
 
-        userName = new JTextField();
-        userName.setColumns(5);
-        enterText = new JTextField();
         enterText.setColumns(10);
+        SwingUtilities.getRootPane(this).setDefaultButton(send);
 
-        send = new JButton("Send");
-        send.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String text = userName.getText() + ": " + enterText.getText();
-
-                MessageClass message = new MessageClass(text, chatRoom);
-
-                try {
-                    out.writeObject(message);
-                }
-                catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                enterText.setText("");
-
-            }
-        });
-
-        quit = new JButton("quit");
-        quit.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-
-        jp = new JPanel(new FlowLayout());
-
-        jp.add(userName);
-        jp.add(enterText);
-        jp.add(send);
-        jp.add(quit);
-
-        add(jsp, BorderLayout.CENTER);
-        add(jp, BorderLayout.SOUTH);
+        rightClickOption();
+        sendMessageListener();
+        setLayout();
 
         setVisible(true);
-        setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setSize(500, 500);
-        // pack();
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try {
+                    out.writeObject(false);
+                    in.close();
+                    out.close();
+                    socket.close();
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         listenSocket();
-        MessageThread t = new MessageThread(in, chatWindow);
+        MessageThread t = new MessageThread(in, chatWindow, chatModel);
         t.start();
+    }
+
+    public void setLayout() {
+        JPanel center = new JPanel(new BorderLayout());
+
+        JPanel centerWindow = new JPanel(new BorderLayout());
+        centerWindow.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        centerWindow.add(jsp, BorderLayout.CENTER);
+        center.add(centerWindow, BorderLayout.CENTER);
+
+        JPanel eastWindow = new JPanel(new BorderLayout());
+        eastWindow.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 20));
+        eastWindow.add(jsp2, BorderLayout.CENTER);
+        center.add(eastWindow, BorderLayout.EAST);
+
+        JPanel jp = new JPanel(new FlowLayout());
+
+        jp.add(enterText);
+        jp.add(send);
+        add(center, BorderLayout.CENTER);
+        add(jp, BorderLayout.SOUTH);
 
     }
 
@@ -122,5 +138,60 @@ public class ChatGUI extends JFrame {
             System.out.println("No I/O in gui");
             System.exit(1);
         }
+    }
+
+    public void rightClickOption() {
+        class RightClickMenu extends JPopupMenu {
+            JMenuItem reportItem;
+
+            public RightClickMenu() {
+                this.reportItem = new JMenuItem("Report");
+                this.add(this.reportItem);
+                this.reportItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        new UserReport();
+                    }
+                });
+            }
+        }
+        chatWindow.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    RightClickMenu menu = new RightClickMenu();
+                    menu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
+
+    public void sendMessageListener() {
+        send.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Calendar calendar = Calendar.getInstance();
+                Timestamp currentTimestamp = new Timestamp(calendar.getTime().getTime());
+                String time = new SimpleDateFormat("yy-MM-dd hh:mm").format(currentTimestamp);
+
+                String text = user.getName() + " (" + time + ") : " + enterText.getText();
+
+                MessageClass message = new MessageClass(text, chatRoom);
+
+                try {
+                    out.writeObject(true);
+                    out.writeObject(message);
+                }
+                catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                enterText.setText("");
+
+            }
+        });
     }
 }

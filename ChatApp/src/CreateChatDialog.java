@@ -135,6 +135,8 @@ public class CreateChatDialog extends JFrame {
                 if (topic.toString().equals(topicName)) {
                     topic.addChatRoom(chatRoom);
                     topic.addRow(chatRoom);
+                    studentFrame.sendTopicsToServer(studentFrame.topicsClasses,
+                            studentFrame.listModel);
                 }
             }
 

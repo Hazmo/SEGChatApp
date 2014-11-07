@@ -18,6 +18,8 @@ public class ChatRoomClass implements Serializable {
 
     String topicName;
 
+    int votes;
+
     /**
      * Instantiates a new chat room class.
      * @param name
@@ -30,6 +32,7 @@ public class ChatRoomClass implements Serializable {
         this.name = name;
         this.description = description;
         connections = 0;
+        votes = 0;
     }
 
     /**
@@ -49,12 +52,16 @@ public class ChatRoomClass implements Serializable {
         return name;
     }
 
+    public int getVotes() {
+        return votes;
+    }
+
     /**
      * Converts and returns the chat room information as an array of strings.
      * @return the chat room information as an array of strings
      */
     public String[] toArray() {
-        String[] chatRoomInfo = { name, "" + connections, description, topicName };
+        String[] chatRoomInfo = { name, "" + connections, description, "" + votes, topicName };
         return chatRoomInfo;
     }
 }

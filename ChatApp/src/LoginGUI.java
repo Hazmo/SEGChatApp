@@ -9,7 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.ObjectInputStream;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import javax.swing.BorderFactory;
@@ -83,14 +83,25 @@ public class LoginGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 try (Socket login = new Socket("localhost", 4455);
-                        PrintWriter out = new PrintWriter(login.getOutputStream(), true);
+                        ObjectOutputStream out = new ObjectOutputStream(login.getOutputStream());
                         ObjectInputStream in = new ObjectInputStream(login.getInputStream());) {
-                    out.println(studentIDField.getText());
-                    out.println(new String(passField.getPassword()));
 
-                    boolean loginConfirm = (boolean) in.readObject();
+                    String idFieldText = studentIDField.getText();
+                    String passFieldText = new String(passField.getPassword());
 
-                    if (loginConfirm) {
+                    MessageClass message = new MessageClass("log_in", idFieldText,
+                            new Object[] { passFieldText });
+
+                    out.writeObject(message);
+
+                    // out.println(studentIDField.getText());
+                    // out.println(new String(passField.getPassword()));
+                    //
+                    // boolean loginConfirm = (boolean) in.readObject();
+
+                    MessageClass loginConfirm = (MessageClass) in.readObject();
+                    
+                    if (loginConfirm.getMessage().equals("true")) {
                         UserClass user = (UserClass) in.readObject();
                         new StudentGUI(user);
                         dispose();

@@ -52,7 +52,7 @@ class RegisterGUI extends JFrame implements ActionListener {
     RegisterGUI() {
 
         try {
-            socket = new Socket("localhost", 4459);
+            socket = new Socket("localhost", 4455);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         }
@@ -144,7 +144,7 @@ class RegisterGUI extends JFrame implements ActionListener {
 
                 int confirmation = 0;
                 try {
-                    out.writeObject(jFields);
+                    out.writeObject(new MessageClass("register", "", jFields));
                     confirmation = (int) in.readObject();
                 }
 

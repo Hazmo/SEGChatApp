@@ -4,6 +4,7 @@ package src;
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
  */
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.table.DefaultTableModel;
@@ -11,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
 /**
  * The class used to store data related to a topic.
  */
-public class TopicClass {
+public class TopicClass implements Serializable {
 
     /** The topic name. */
     String topicName;
@@ -30,7 +31,7 @@ public class TopicClass {
     public TopicClass(String topicName) {
         chatRooms = new ArrayList<ChatRoomClass>();
         this.topicName = topicName;
-        String[] columnHeaders = { "Room Name", "Users", "Description", "Topics" };
+        String[] columnHeaders = { "Room Name", "Users", "Description", "Votes", "Topics" };
         tableModel = new DefaultTableModel(columnHeaders, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
