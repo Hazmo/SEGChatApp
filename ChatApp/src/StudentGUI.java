@@ -13,32 +13,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-
-import src.StudentGUI.TableMouseListener.RightClickMenu;
 
 /**
  * This class is used to create GUI displaying all available chat rooms in their respective topics,
@@ -58,15 +47,12 @@ public class StudentGUI extends JFrame {
 
     /** The user settings button. */
     JButton settingsButton = new JButton("Settings");
-    
-    /** The moderator reports button. */
-    JButton reportsButton = new JButton("Mod Reports");
 
     /** The topics list. */
     JList topicsList = new JList();
 
     /** The chat rooms table. */
-    final JTable roomsTable = new JTable();
+    JTable roomsTable = new JTable();
 
     /** The list model for the list of topics. */
     DefaultListModel listModel = new DefaultListModel();
@@ -90,7 +76,7 @@ public class StudentGUI extends JFrame {
     ArrayList<ChatRoomClass> chatRooms = new ArrayList<ChatRoomClass>();
 
     /** Column headers for the table */
-    String[] columnHeaders = { "Room Name", "Users", "Description", "Votes", "Topic" };
+    String[] columnHeaders = { "Room Name", "Users", "Description", "Topic" };
 
     /** The button used to refresh the list of chat rooms. */
     JButton refreshButton = new JButton("Refresh List");
@@ -99,8 +85,11 @@ public class StudentGUI extends JFrame {
     ArrayList<TopicClass> topicsClasses = new ArrayList<TopicClass>();
 
     UserClass user;
+
     Socket s;
+
     ObjectOutputStream out;
+
     ObjectInputStream in;
 
     /**
@@ -119,12 +108,12 @@ public class StudentGUI extends JFrame {
      * Sets the layout for the student GUI.
      */
     public void setLayout() {
+
         try {
             s = new Socket("localhost", 4458);
             out = new ObjectOutputStream(s.getOutputStream());
             in = new ObjectInputStream(s.getInputStream());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -163,8 +152,8 @@ public class StudentGUI extends JFrame {
             }
         });
 
-        roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
-        roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
+        roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
+        roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
 
         roomsTable.addMouseListener(new TableMouseListener());
         tableModel = (DefaultTableModel) roomsTable.getModel();
@@ -195,15 +184,6 @@ public class StudentGUI extends JFrame {
 
         final JPanel southPanel = new JPanel(new FlowLayout());
         createButton.addActionListener(new CreateButtonListener(this));
-        if(user.isAdmin()) {
-        	reportsButton.addActionListener(new ActionListener() {
-        		@Override
-        		public void actionPerformed(ActionEvent e) {
-        			new ModeratorReports();
-        		}
-        	});
-        	southPanel.add(reportsButton);
-        }
         southPanel.add(createButton);
         refreshButton.addActionListener(new RefreshButtonListener(this));
         southPanel.add(refreshButton);
@@ -213,6 +193,8 @@ public class StudentGUI extends JFrame {
         add(southPanel, BorderLayout.SOUTH);
 
         getTopicsFromServer();
+
+
     }
 
     /**
@@ -238,33 +220,30 @@ public class StudentGUI extends JFrame {
             out.writeObject(topics);
             out.writeObject(topicsListModel);
             getTopicsFromServer();
-        }
-        catch (IOException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }
 
     public void getTopicsFromServer() {
         try {
-            int index = topicsList.getSelectedIndex();
             out.writeObject(new MessageClass("get_topics", "whatever"));
             setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
             setTopicsJListModel((DefaultListModel) in.readObject());
-            topicsList.setSelectedIndex(index);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
     }
+
     public class SignoutButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             System.gc();
-            for (java.awt.Window window : Window.getWindows()) {
+            for (Window window : Window.getWindows()) {
                 window.dispose();
             }
             new LoginGUI();
@@ -292,6 +271,7 @@ public class StudentGUI extends JFrame {
                     results.add(chatRoom);
                 }
             }
+
             return results;
         }
 
@@ -329,8 +309,8 @@ public class StudentGUI extends JFrame {
             topicsList.clearSelection();
             roomsTable.setModel(tblResults);
 
-            roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
-            roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
+            roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
+            roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
         }
 
         @Override
@@ -356,7 +336,7 @@ public class StudentGUI extends JFrame {
     /**
      * The listener interface for receiving events in the settings button. Opens up a new frame
      * containing the user settings when the button is pressed.
-     * @see src.SettingsClass
+     * @see SettingsClass
      */
     public class SettingsButtonListener implements ActionListener {
 
@@ -373,93 +353,61 @@ public class StudentGUI extends JFrame {
      * The listener interface for receiving events in the chat rooms table. It gets the table row
      * that is selected, using this to get the chat room object from the topics class and using this
      * to open the chat GUI.
-     * @see src.TopicClass
-     * @see src.ChatRoomClass
+     * @see TopicClass
+     * @see ChatRoomClass
      */
     public class TableMouseListener extends MouseAdapter {
 
         @Override
         public void mouseClicked(final MouseEvent e) {
-            if (e.getClickCount() == 2) {
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
                 int rowIndex = roomsTable.getSelectedRow();
-                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 4);
+                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 3);
                 for (TopicClass topic : topicsClasses) {
                     if (topic.toString().equals(topicString)) {
                         for (ChatRoomClass chatRoom : topic.getChatRooms()) {
                             if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
-                                new ChatGUI(chatRoom, user);
-                                System.out.println("" + chatRoom.votes);
+                                new ChatGUI(chatRoom, StudentGUI.this.user);
                                 break;
                             }
+
                         }
                         break;
                     }
                 }
-            }
-        }
 
-        /**
-         * @param e
-         */
-        @Override
-        public void mouseReleased(final MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                this.doPop(e);
-            }
-        }
+            } else if (SwingUtilities.isRightMouseButton( e )) {
+                int rowNumber = roomsTable.rowAtPoint(e.getPoint());
 
-        /**
-         * creates a menu and shows it at the place where the current mouse location is
-         * @param e
-         *        mouse event
-         */
-        private void doPop(final MouseEvent e) {
-            final RightClickMenu menu = new RightClickMenu();
-            menu.show(e.getComponent(), e.getX(), e.getY());
-            roomsTable.setRowSelectionInterval(roomsTable.rowAtPoint(e.getPoint()),
-                    roomsTable.rowAtPoint(e.getPoint()));
+                // Get the ListSelectionModel of the JTable
+                ListSelectionModel chatLSModel = roomsTable.getSelectionModel();
+
+                // set the selected interval of rows. Using the "rowNumber"
+                // variable for the beginning and end selects only that one row.
+                chatLSModel.setSelectionInterval(rowNumber, rowNumber);
+                if (chatLSModel.isSelectionEmpty()==false) {
+                    RightClickMenu menu = new RightClickMenu(chatLSModel);
+                    menu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
         }
 
         /**
          * class with the constructor that creates menu on right mouse click.
          */
-        class RightClickMenu extends JPopupMenu implements ActionListener {
+        class RightClickMenu extends JPopupMenu {
             JMenuItem reportItem;
-            JMenuItem upvoteItem;
-            JMenuItem downVoteItem;
 
-            public RightClickMenu() {
-                reportItem = new JMenuItem("Report");
-                add(reportItem);
-                upvoteItem = new JMenuItem("Upvote");
-                add(upvoteItem);
-                upvoteItem.addActionListener(this);
-                downVoteItem = new JMenuItem("Downvote");
-                add(downVoteItem);
-                downVoteItem.addActionListener(this);
-            }
+            public RightClickMenu(final ListSelectionModel chatLSModel) {
+                this.reportItem = new JMenuItem("Report");
+                this.add(this.reportItem);
+                this.reportItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int rowIndex = roomsTable.getSelectedRow();
-                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 4);
-                for (TopicClass topic : topicsClasses) {
-                    if (topic.toString().equals(topicString)) {
-                        for (ChatRoomClass chatRoom : topic.getChatRooms()) {
-                            if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
-                                if (e.getSource().equals(downVoteItem))
-                                    chatRoom.votes--;
-                                if (e.getSource().equals(upvoteItem))
-                                    chatRoom.votes++;
-                                topic.tableModel.setValueAt(chatRoom.votes, rowIndex, 3);
-                                System.out.println(chatRoom.votes);
-                                break;
-                            }
-                        }
-                        break;
+                        new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString());
                     }
-                }
-                sendTopicsToServer(topicsClasses, listModel);
+                });
             }
         }
     }
@@ -508,8 +456,8 @@ public class StudentGUI extends JFrame {
             for (final TopicClass topic : topicsClasses) {
                 if (topic.topicName.equals(topicString)) {
                     roomsTable.setModel(topic.getTableModel());
-                    roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
-                    roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
+                    roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
+                    roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
 
                 }
             }
@@ -517,6 +465,7 @@ public class StudentGUI extends JFrame {
     }
 
     public class RefreshButtonListener implements ActionListener {
+
         StudentGUI ui;
 
         public RefreshButtonListener(StudentGUI ui) {
@@ -525,8 +474,7 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ui.getTopicsFromServer();
-
+            ui.getTopicsFromServer();;
         }
     }
 }

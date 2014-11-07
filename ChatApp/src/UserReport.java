@@ -1,53 +1,36 @@
-
 package src;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*; import java.awt.*; import java.awt.event.ActionEvent; import java.awt.event.ActionListener;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
+/** * Created by Ainura on 03.11.2014. */ class UserReport extends JFrame implements ActionListener{
+JLabel question;
+    String questionString= "What would you like to report about?";
+    JComponent answer = new JTextField(30);
+    JTextArea detailsTextArea;
 
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-/**
- * Created by Ainura on 03.11.2014.
- */
-class UserReport extends JFrame implements ActionListener{
-
-	String title;
-	UserClass user;
-	JTextField answer = new JTextField(30);
-	JTextArea detailsTextArea = new JTextArea(10, 30);
-	
-    UserReport(UserClass user, String title) {
-    	this.user = user;
-    	this.title = title;
-        setTitle("Report: " + title);
+    UserReport() {
+        addLayout();
+    }
+    UserReport(String reportObject, String reportObjectValue) {
+        questionString = "You are reporting about the following "+ reportObject;
+        answer = new JLabel(reportObjectValue);
+        answer.setForeground(Color.blue);
+        answer.setBackground(Color.lightGray);
+        addLayout();
+    }
+    public void addLayout() {
+        setTitle("Report");
         ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 20));
         JPanel main = new JPanel(new BorderLayout(0, 10));
         JPanel north = new JPanel(new BorderLayout());
         JPanel center = new JPanel(new BorderLayout());
         JPanel south = new JPanel(new FlowLayout());
 
-        JLabel question = new JLabel("What would you like to report about?");
-        JTextField answer = new JTextField(30);
-        JLabel detailsLabel = new JLabel("Give us more details");
-        JTextArea detailsTextArea = new JTextArea(10, 30);
 
+
+        JLabel question = new JLabel(questionString);
+        JLabel detailsLabel = new JLabel("Why do you want to report about this?");
+        detailsTextArea = new JTextArea(10, 30);
         JButton submitButton = new JButton("SUBMIT");
         JButton cancelButton = new JButton("CANCEL");
         submitButton.addActionListener(this);
@@ -59,14 +42,11 @@ class UserReport extends JFrame implements ActionListener{
         north.add(answer, BorderLayout.SOUTH);
         center.add(detailsLabel, BorderLayout.NORTH);
         center.add(detailsTextArea, BorderLayout.CENTER);
-        south.add(submitButton);
-        south.add(cancelButton);
-
+        south.add(submitButton); south.add(cancelButton);
 
         main.add(north, BorderLayout.NORTH);
         main.add(center, BorderLayout.CENTER);
         main.add(south, BorderLayout.SOUTH);
-
 
         add(main);
         setResizable(false);
@@ -76,34 +56,18 @@ class UserReport extends JFrame implements ActionListener{
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("submit")) {
-            submitReport();
-            JOptionPane
-                    .showMessageDialog(this,
-                            "Thank you for reporting about the problem! Your report has been sent to the moderator.");
-            this.dispose();
-
+        if(e.getActionCommand().equals("submit")) {
+            if (detailsTextArea.getText().equals("")) {
+                JOptionPane.showMessageDialog(this, "You did not tell us the reason for your report! Please, fill the relevant section for this.");
+            } else {
+                submitReport();
+                JOptionPane.showMessageDialog(this, "Thank you for your report! It will be reviewed by a moderator.");
+                this.dispose();
+            }
         } else {
             this.dispose();
         }
-    }
-    private void submitReport() {
-    	String userName = user.getName();
-    	String reportTitle = answer.getText().toString();
-    	String reportMessage = detailsTextArea.getText().toString();
-    	
-    	ReportClass report = new ReportClass(userName, reportTitle, reportMessage, title);
-    	
-    	try(Socket reportSocket = new Socket("localhost", 4459);
-            ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
-    		BufferedReader in = new BufferedReader(new InputStreamReader(reportSocket.getInputStream()));
-    	){
-    		out.writeObject(new String("ADD"));
-    		out.writeObject(report);
-    		JOptionPane.showMessageDialog(null, in.readLine());
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
+    } private void submitReport() {
+
     }
 }
-
