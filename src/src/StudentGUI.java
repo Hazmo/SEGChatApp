@@ -1,15 +1,23 @@
-package src;
-
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
  */
+//import sun.plugin2.message.Message;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -30,6 +38,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import src.StudentGUI.TableMouseListener.RightClickMenu;
 
 /**
  * This class is used to create GUI displaying all available chat rooms in their respective topics,
@@ -57,7 +67,7 @@ public class StudentGUI extends JFrame {
     JList topicsList = new JList();
 
     /** The chat rooms table. */
-    JTable roomsTable = new JTable();
+    final JTable roomsTable = new JTable();
 
     /** The list model for the list of topics. */
     DefaultListModel listModel = new DefaultListModel();
@@ -81,7 +91,7 @@ public class StudentGUI extends JFrame {
     ArrayList<ChatRoomClass> chatRooms = new ArrayList<ChatRoomClass>();
 
     /** Column headers for the table */
-    String[] columnHeaders = { "Room Name", "Users", "Description" };
+    String[] columnHeaders = { "Room Name", "Users", "Description", "Topic" };
 
     /** The button used to refresh the list of chat rooms. */
     JButton refreshButton = new JButton("Refresh List");
@@ -90,6 +100,12 @@ public class StudentGUI extends JFrame {
     ArrayList<TopicClass> topicsClasses = new ArrayList<TopicClass>();
 
     UserClass user;
+
+    Socket s;
+
+    ObjectOutputStream out;
+
+    ObjectInputStream in;
 
     /**
      * Instantiates a new student class.
@@ -107,6 +123,16 @@ public class StudentGUI extends JFrame {
      * Sets the layout for the student GUI.
      */
     public void setLayout() {
+
+        try {
+            s = new Socket("localhost", 4458);
+            out = new ObjectOutputStream(s.getOutputStream());
+            in = new ObjectInputStream(s.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(0, 20));
 
         final JPanel searchPanel = new JPanel(new BorderLayout());
@@ -115,7 +141,7 @@ public class StudentGUI extends JFrame {
 
         searchButton.addActionListener(new SearchButtonListener());
 
-        final JPanel northEastPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        final JPanel northEastPanel = new JPanel(new FlowLayout());
         settingsButton.addActionListener(new SettingsButtonListener());
         northEastPanel.add(settingsButton);
         signoutButton.addActionListener(new SignoutButtonListener());
@@ -134,14 +160,19 @@ public class StudentGUI extends JFrame {
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         roomsTable.setDefaultRenderer(Object.class, centerRenderer);
         roomsTable.setShowVerticalLines(false);
-        roomsTable.setModel(new DefaultTableModel(this.columnHeaders, 0) {
+        roomsTable.setModel(new DefaultTableModel(columnHeaders, 0) {
             @Override
             public boolean isCellEditable(final int row, final int column) {
                 return false;
             }
         });
+
+        roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
+        roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
+
         roomsTable.addMouseListener(new TableMouseListener());
         tableModel = (DefaultTableModel) roomsTable.getModel();
+
         roomsTable.setRowHeight(20);
         final TitledBorder tableTitle = new TitledBorder("Chat Rooms");
         tableTitle.setTitleJustification(TitledBorder.CENTER);
@@ -183,22 +214,61 @@ public class StudentGUI extends JFrame {
         add(northPanel, BorderLayout.NORTH);
         add(topicRoomsPanel, BorderLayout.CENTER);
         add(southPanel, BorderLayout.SOUTH);
+
+        getTopicsFromServer();
+
+
     }
 
     /**
      * Adds the new chatroom to the chatroom ArrayList
      * @param ChatRoomClass
-     * @see CreateChatDialog
+     * @see src.CreateChatDialog
      */
     public void addChatToList(final ChatRoomClass chat) {
         this.chatRooms.add(chat);
+    }
+
+    public void setTopicsArrayList(ArrayList<TopicClass> topics) {
+        this.topicsClasses = topics;
+    }
+
+    public void setTopicsJListModel(DefaultListModel topicsModel) {
+        topicsList.setModel(topicsModel);
+    }
+
+    public void sendTopicsToServer(ArrayList<TopicClass> topics, DefaultListModel topicsListModel) {
+        try {
+            out.writeObject(new MessageClass("send_topics", "whatever"));
+            out.writeObject(topics);
+            out.writeObject(topicsListModel);
+            getTopicsFromServer();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getTopicsFromServer() {
+        try {
+            out.writeObject(new MessageClass("get_topics", "whatever"));
+            setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
+            setTopicsJListModel((DefaultListModel) in.readObject());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public class SignoutButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            dispose();
+            System.gc();
+            for (Window window : Window.getWindows()) {
+                window.dispose();
+            }
             new LoginGUI();
         }
     }
@@ -218,9 +288,9 @@ public class StudentGUI extends JFrame {
         ArrayList<ChatRoomClass> getResults(final String toSearch) {
             final ArrayList<ChatRoomClass> results = new ArrayList<ChatRoomClass>();
 
-            for (final ChatRoomClass chatRoom : StudentGUI.this.chatRooms) {
-                if (this.naiveSearch(chatRoom.toString().toLowerCase(), toSearch)
-                        || this.naiveSearch(chatRoom.getDesc().toLowerCase(), toSearch)) {
+            for (final ChatRoomClass chatRoom : chatRooms) {
+                if (naiveSearch(chatRoom.toString().toLowerCase(), toSearch)
+                        || naiveSearch(chatRoom.getDesc().toLowerCase(), toSearch)) {
                     results.add(chatRoom);
                 }
             }
@@ -242,7 +312,6 @@ public class StudentGUI extends JFrame {
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -252,7 +321,7 @@ public class StudentGUI extends JFrame {
         void appendTable(final ArrayList<ChatRoomClass> results) {
             final DefaultTableModel tblResults = (new DefaultTableModel(columnHeaders, 0) {
                 @Override
-                public boolean isCellEditable(final int row, final int column) {
+                public boolean isCellEditable(int row, int column) {
                     return false;
                 }
             });
@@ -260,15 +329,18 @@ public class StudentGUI extends JFrame {
             for (final ChatRoomClass cr : results) {
                 tblResults.addRow(cr.toArray());
             }
-
+            topicsList.clearSelection();
             roomsTable.setModel(tblResults);
+
+            roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
+            roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
         }
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            if (!StudentGUI.this.searchField.getText().equals("")) {
-                final ArrayList<ChatRoomClass> results = this
-                        .getResults(StudentGUI.this.searchField.getText().toLowerCase());
+            if (!searchField.getText().equals("")) {
+                final ArrayList<ChatRoomClass> results = getResults(searchField.getText()
+                        .toLowerCase());
                 if (results.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "No chatrooms found :-(");
                 }
@@ -287,7 +359,7 @@ public class StudentGUI extends JFrame {
     /**
      * The listener interface for receiving events in the settings button. Opens up a new frame
      * containing the user settings when the button is pressed.
-     * @see SettingsClass
+     * @see src.SettingsClass
      */
     public class SettingsButtonListener implements ActionListener {
 
@@ -296,7 +368,7 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            this.settingsFrame = new SettingsClass(StudentGUI.this.user);
+            this.settingsFrame = new SettingsClass(user);
         }
     }
 
@@ -304,20 +376,26 @@ public class StudentGUI extends JFrame {
      * The listener interface for receiving events in the chat rooms table. It gets the table row
      * that is selected, using this to get the chat room object from the topics class and using this
      * to open the chat GUI.
-     * @see TopicClass
-     * @see ChatRoomClass
+     * @see src.TopicClass
+     * @see src.ChatRoomClass
      */
     public class TableMouseListener extends MouseAdapter {
 
         @Override
         public void mouseClicked(final MouseEvent e) {
             if (e.getClickCount() == 2) {
-                final int tableIndex = roomsTable.getSelectedRow();
-                final String topicString = (String) topicsList.getSelectedValue();
-                for (final TopicClass topic : StudentGUI.this.topicsClasses) {
+                int rowIndex = roomsTable.getSelectedRow();
+                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 3);
+                for (TopicClass topic : topicsClasses) {
                     if (topic.toString().equals(topicString)) {
-                        final ChatRoomClass chatRoom = topic.getChatRooms().get(tableIndex);
-                        new ChatGUI(chatRoom);
+                        for (ChatRoomClass chatRoom : topic.getChatRooms()) {
+                            if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
+                                new ChatGUI(chatRoom, StudentGUI.this.user);
+                                break;
+                            }
+
+                        }
+                        break;
                     }
                 }
 
@@ -350,7 +428,7 @@ public class StudentGUI extends JFrame {
          *        mouse event
          */
         private void doPop(final MouseEvent e) {
-            final RightClickMenu menu = new RightClickMenu();
+            final RightClickMenu menu = new RightClickMenu(e);
             menu.show(e.getComponent(), e.getX(), e.getY());
         }
 
@@ -359,14 +437,37 @@ public class StudentGUI extends JFrame {
          */
         class RightClickMenu extends JPopupMenu {
             JMenuItem reportItem;
-
-            public RightClickMenu() {
+            JMenuItem deleteRoom;
+            
+            public RightClickMenu(final MouseEvent a) {
+            	int r = roomsTable.rowAtPoint(a.getPoint());
+            	if(r >= 0 && r < roomsTable.getRowCount()) { 
+            		roomsTable.setRowSelectionInterval(r, r);
+            	}
+            	
+            	final int row = roomsTable.getSelectedRow();
+            	final DefaultTableModel tblMod = (DefaultTableModel) roomsTable.getModel();
+            	
+            	if(user.isAdmin()) {
+            		this.deleteRoom = new JMenuItem("Delete Chatroom");
+            		this.add(this.deleteRoom);
+            		this.deleteRoom.addActionListener(new ActionListener() {
+            			@Override
+            			public void actionPerformed(ActionEvent e) {
+            				tblMod.removeRow(row);
+            				roomsTable.setModel(tblMod);
+            				sendTopicsToServer(topicsClasses, listModel);
+            				getTopicsFromServer();
+            			}
+            		});            		
+            	}
                 this.reportItem = new JMenuItem("Report");
                 this.add(this.reportItem);
                 this.reportItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        new UserReport(user);
+                    	String source = (String) tblMod.getValueAt(row, 0);
+                        new UserReport(user, source);
                     }
                 });
             }
@@ -404,18 +505,38 @@ public class StudentGUI extends JFrame {
      * The listener used for receiving events from the topics list. Listens for a selection in the
      * topics list: if it detects an event, it will update the rooms table with all the chat rooms
      * from the selected topic.
-     * @see ListSelectionEvent
+     * @see javax.swing.event.ListSelectionEvent
      */
     public class TopicsMouseSelectionListener implements ListSelectionListener {
 
+        public TopicsMouseSelectionListener() {
+        }
+
         @Override
         public void valueChanged(final ListSelectionEvent e) {
-            final String topicString = (String) StudentGUI.this.topicsList.getSelectedValue();
-            for (final TopicClass topic : StudentGUI.this.topicsClasses) {
+            final String topicString = (String) topicsList.getSelectedValue();
+            for (final TopicClass topic : topicsClasses) {
                 if (topic.topicName.equals(topicString)) {
                     roomsTable.setModel(topic.getTableModel());
+                    roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
+                    roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
+
                 }
             }
+        }
+    }
+
+    public class RefreshButtonListener implements ActionListener {
+
+        StudentGUI ui;
+
+        public RefreshButtonListener(StudentGUI ui) {
+            this.ui = ui;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ui.getTopicsFromServer();;
         }
     }
 }

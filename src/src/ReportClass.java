@@ -1,4 +1,4 @@
-package src;
+
 
 import java.io.Serializable;
 
@@ -7,15 +7,22 @@ public class ReportClass implements Serializable {
 	String user;
 	String reportTitle;
 	String reportMessage;
+	String source;
+	boolean isOpen = true;
 	
-	ReportClass(String user, String reportTitle, String reportMessage) {
+	ReportClass(String user, String reportTitle, String reportMessage, String source) {
 		this.user = user;
 		this.reportTitle = reportTitle;
 		this.reportMessage = reportMessage;
+		this.source = source;
 	}
 	
 	String getUser() {
 		return user;
+	}
+	
+	String getSource() {
+		return source;
 	}
 	
 	String getReportTitle() {
@@ -27,10 +34,15 @@ public class ReportClass implements Serializable {
 	}
 	
 	String getListDesc() {
-		return new String(user + " - " + reportTitle);
+		return new String(user + " - " + reportTitle + " - " + source);
 	}
 	
 	void setResolved() {
-		reportTitle += " [RESOLVED]";
+		source += " [RESOLVED]";
+		isOpen = false;
+	}
+	
+	boolean isOpen() {
+		return isOpen;
 	}
 }

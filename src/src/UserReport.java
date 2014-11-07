@@ -1,5 +1,3 @@
-package src;
-
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -26,19 +24,21 @@ import javax.swing.JTextField;
  */
 class UserReport extends JFrame implements ActionListener{
 
+	String title;
 	UserClass user;
 	JTextField answer = new JTextField(30);
 	JTextArea detailsTextArea = new JTextArea(10, 30);
 	
-    UserReport(UserClass user) {
+    UserReport(UserClass user, String title) {
     	this.user = user;
-        setTitle("Report");
+    	this.title = title;
+        setTitle("Report: " + title);
         ((JComponent) getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 20));
         JPanel main = new JPanel(new BorderLayout(0, 10));
         JPanel north = new JPanel(new BorderLayout());
         JPanel center = new JPanel(new BorderLayout());
         JPanel south = new JPanel(new FlowLayout());
-
+        
         JLabel question = new JLabel("What would you like to report about?");
         JLabel detailsLabel = new JLabel("Give us more details");
         JButton submitButton = new JButton("SUBMIT");
@@ -83,9 +83,9 @@ class UserReport extends JFrame implements ActionListener{
     	String reportTitle = answer.getText().toString();
     	String reportMessage = detailsTextArea.getText().toString();
     	
-    	ReportClass report = new ReportClass(userName, reportTitle, reportMessage);
+    	ReportClass report = new ReportClass(userName, reportTitle, reportMessage, title);
     	
-    	try(Socket reportSocket = new Socket("localhost", 4457);
+    	try(Socket reportSocket = new Socket("localhost", 4459);
             ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
     		BufferedReader in = new BufferedReader(new InputStreamReader(reportSocket.getInputStream()));
     	){

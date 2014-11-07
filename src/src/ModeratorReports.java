@@ -1,4 +1,4 @@
-package src;
+
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -49,12 +49,13 @@ public class ModeratorReports extends JFrame {
 		});
 		JScrollPane rplPane = new JScrollPane(reportsList);
 		JScrollPane textPane = new JScrollPane(reportDesc);
+		reportDesc.setEditable(false);
 		centrePanel.setBorder(BorderFactory.createEmptyBorder(10,10,0,10));
 		centrePanel.add(rplPane, BorderLayout.CENTER);
 		centrePanel.add(textPane, BorderLayout.SOUTH);
 		add(centrePanel, BorderLayout.CENTER);
 		
-		try(Socket reportSocket = new Socket("localhost", 4457);
+		try(Socket reportSocket = new Socket("localhost", 4459);
 				ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
 		    	ObjectInputStream in = new ObjectInputStream(reportSocket.getInputStream());
 			) {
@@ -80,9 +81,14 @@ public class ModeratorReports extends JFrame {
 				} else {
 					int repElem = reportsList.getSelectedIndex();
 					ReportClass rep = reports.get(repElem);
-					rep.setResolved();
-					setResolved();
-					setReports();
+					
+					if(rep.isOpen()) {
+						rep.setResolved();
+						setResolved();
+						setReports();						
+					} else {
+						JOptionPane.showMessageDialog(null, "Has already been resolved.");
+					}
 				}
 			}
 		});
@@ -115,7 +121,7 @@ public class ModeratorReports extends JFrame {
 	}
 	
 	void setResolved() {
-		try(Socket reportSocket = new Socket("localhost", 4457);
+		try(Socket reportSocket = new Socket("localhost", 4459);
 				ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
 		    	ObjectInputStream in = new ObjectInputStream(reportSocket.getInputStream());
 			) {

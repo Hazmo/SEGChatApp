@@ -1,4 +1,4 @@
-package src;
+
 
 /**
  * @author Ainur Makhmet - 1320744
@@ -9,6 +9,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,7 +52,7 @@ class RegisterGUI extends JFrame implements ActionListener {
     RegisterGUI() {
 
         try {
-            socket = new Socket("localhost", 4459);
+            socket = new Socket("localhost", 4455);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         }
@@ -58,6 +60,7 @@ class RegisterGUI extends JFrame implements ActionListener {
             e.printStackTrace();
         }
 
+        setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setTitle("REGISTRATION FORM");
 
         JPanel center = new JPanel(new GridLayout(6, 1, 10, 10));
@@ -111,6 +114,19 @@ class RegisterGUI extends JFrame implements ActionListener {
         submitButton.addActionListener(this);
         cancelButton.addActionListener(this);
 
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                try {
+                    socket.close();
+                    in.close();
+                    out.close();
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
         setResizable(false);
         pack();
         setLocationRelativeTo(null);
@@ -128,7 +144,8 @@ class RegisterGUI extends JFrame implements ActionListener {
 
                 int confirmation = 0;
                 try {
-                    out.writeObject(jFields);
+                    out.writeObject(new MessageClass("register", "",jFields));
+                    //out.writeObject(jFields);
                     confirmation = (int) in.readObject();
                 }
 

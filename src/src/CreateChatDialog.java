@@ -1,4 +1,5 @@
-package src;
+
+
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
@@ -8,6 +9,9 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -53,11 +57,15 @@ public class CreateChatDialog extends JFrame {
     /** The model used by the topics ComboBox */
     DefaultComboBoxModel topicsModel;
 
+
+
     /**
      * Instantiates the CreateChatDialog class
      * @param studentFrame
      *        the frame containing the student GUI
      */
+
+
     public CreateChatDialog(StudentGUI studentFrame) {
         this.studentFrame = studentFrame;
         setLocationRelativeTo(null);
@@ -127,15 +135,17 @@ public class CreateChatDialog extends JFrame {
             String chatRoomDescription = descriptionArea.getText();
             String[] rowData = { chatRoomName, "0", chatRoomDescription };
 
-            ChatRoomClass chatRoom = new ChatRoomClass(chatRoomName, chatRoomDescription);
+            ChatRoomClass chatRoom = new ChatRoomClass(topicName, chatRoomName, chatRoomDescription);
             studentFrame.addChatToList(chatRoom);
 
             for (TopicClass topic : studentFrame.topicsClasses) {
                 if (topic.toString().equals(topicName)) {
                     topic.addChatRoom(chatRoom);
                     topic.addRow(chatRoom);
+                    studentFrame.sendTopicsToServer(studentFrame.topicsClasses, studentFrame.listModel);
                 }
             }
+
 
             this.parent.dispose();
 

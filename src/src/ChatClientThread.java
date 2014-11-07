@@ -1,21 +1,21 @@
-package src;
+
 
 import java.io.IOException;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ChatClientThread extends Thread {
 
-    ServerSocket server;
+    Socket socket;
     ObjectInputStream in = null;
     ObjectOutputStream out = null;
 
     String roomName = null;
 
-    public ChatClientThread(ServerSocket server) {
-        this.server = server;
+    public ChatClientThread(Socket socket) {
+        this.socket = socket;
 
     }
 
@@ -26,51 +26,44 @@ public class ChatClientThread extends Thread {
     @Override
     public void run() {
         while (true) {
+            MessageClass message;
             try {
-                Socket s = server.accept();
-                MessageClass message;
+                in = new ObjectInputStream(socket.getInputStream());
+                out = new ObjectOutputStream(socket.getOutputStream());
+
+                MessageClass initialMessage = (MessageClass) in.readObject();
+                roomName = initialMessage.getRoomName();
+            }
+            catch (IOException e) {
+                System.out.println(e.getMessage());
+                System.out.println("I/O failed.");
+                System.exit(-1);
+            }
+            catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            while (true) {
+
                 try {
-                    in = new ObjectInputStream(s.getInputStream());
-                    out = new ObjectOutputStream(s.getOutputStream());
+                    message = (MessageClass) in.readObject();
 
-                    MessageClass initialMessage = (MessageClass) in.readObject();
-                    roomName = initialMessage.getRoomName();
+                    for (ChatClientThread thread : MainChatThread.getClientThreads()) {
+                        if (message.getRoomName().equals(thread.getRoomName())) {
+                            thread.sendMessage(message);
+                        }
+                    }
                 }
-                catch (IOException e) {
-                    System.out.println(e.getMessage());
-                    System.out.println("I/O failed.");
-                    System.exit(-1);
 
+                catch (IOException e) {
+                    System.out.println("Read failed.");
+                    System.exit(-1);
                 }
                 catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
-                while (true) {
-
-                    try {
-                        message = (MessageClass) in.readObject();
-
-                        for (ChatClientThread thread : ChatServer.getClientThreads()) {
-                            if (message.getRoomName().equals(thread.getRoomName())) {
-                                thread.sendMessage(message);
-                            }
-                        }
-                    }
-                    catch (IOException e) {
-                        System.out.println("Read failed");
-                        System.exit(-1);
-                    }
-                    catch (ClassNotFoundException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-            catch (IOException e) {
-                System.out.println("Accept failed: 4455");
-                System.exit(-1);
             }
         }
 

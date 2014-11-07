@@ -1,4 +1,4 @@
-package src;
+
 
 import java.io.Serializable;
 
@@ -16,6 +16,8 @@ public class ChatRoomClass implements Serializable {
     /** The description of the chat room. */
     String description;
 
+    String topicName;
+
     /**
      * Instantiates a new chat room class.
      * @param name
@@ -23,7 +25,8 @@ public class ChatRoomClass implements Serializable {
      * @param description
      *        the description of the chat room
      */
-    public ChatRoomClass(String name, String description) {
+    public ChatRoomClass(String topicName, String name, String description) {
+        this.topicName = topicName;
         this.name = name;
         this.description = description;
         connections = 0;
@@ -37,6 +40,10 @@ public class ChatRoomClass implements Serializable {
         return description;
     }
 
+    public String getTopic() {
+        return topicName;
+    }
+
     @Override
     public String toString() {
         return name;
@@ -47,7 +54,7 @@ public class ChatRoomClass implements Serializable {
      * @return the chat room information as an array of strings
      */
     public String[] toArray() {
-        String[] chatRoomInfo = { name, "" + connections, description };
+        String[] chatRoomInfo = { name, "" + connections, description, topicName };
         return chatRoomInfo;
     }
 }
