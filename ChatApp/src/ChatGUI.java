@@ -1,9 +1,14 @@
 package src;
 
+import java.awt.AWTException;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -38,27 +43,22 @@ public class ChatGUI extends JFrame {
     JList chatWindow = new JList();
     DefaultListModel<String> chatModel = new DefaultListModel<String>();
     JScrollPane jsp = new JScrollPane(chatWindow);
-
+    
     JList userWindow = new JList();
     DefaultListModel<String> userModel = new DefaultListModel<String>();
     JScrollPane jsp2 = new JScrollPane(userWindow);
-
+    
     JTextField enterText = new JTextField();
     JButton send = new JButton("Send");
 
-    UserClass user;
-
-    JTextField userName;
-    JButton quit;
-
-    JPanel jp;
-
     ChatRoomClass chatRoom;
+    UserClass user;
 
     public ChatGUI(final ChatRoomClass chatRoom, UserClass user) {
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         this.chatRoom = chatRoom;
         this.user = user;
+
 
         setTitle(chatRoom.toString());
         chatWindow.setModel(chatModel);
@@ -112,6 +112,7 @@ public class ChatGUI extends JFrame {
 
         jp.add(enterText);
         jp.add(send);
+
         add(center, BorderLayout.CENTER);
         add(jp, BorderLayout.SOUTH);
 
@@ -139,18 +140,35 @@ public class ChatGUI extends JFrame {
             System.exit(1);
         }
     }
-
-    public void rightClickOption() {
+    
+    public void rightClickOption(){
         class RightClickMenu extends JPopupMenu {
             JMenuItem reportItem;
+            JMenuItem deleteMsg;
 
-            public RightClickMenu() {
+            public RightClickMenu(final MouseEvent a) {
+            	final int r = chatWindow.locationToIndex(a.getPoint());
+            	chatWindow.setSelectedIndex(r);
+            	final String source = (String) chatWindow.getSelectedValue();
+            	
+            	if(user.isAdmin()) {
+            		this.deleteMsg = new JMenuItem("Delete Message");
+            		this.add(this.deleteMsg);
+            		this.deleteMsg.addActionListener(new ActionListener() {
+            			@Override
+            			public void actionPerformed(ActionEvent e) {
+            				chatWindow.remove(r);
+            				
+            			}
+            		});          		
+            	}
+
                 this.reportItem = new JMenuItem("Report");
                 this.add(this.reportItem);
                 this.reportItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        new UserReport();
+                        new UserReport(user, source);
                     }
                 });
             }
@@ -161,7 +179,7 @@ public class ChatGUI extends JFrame {
             public void mousePressed(MouseEvent e) {
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    RightClickMenu menu = new RightClickMenu();
+                    RightClickMenu menu = new RightClickMenu(e);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -175,6 +193,7 @@ public class ChatGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 Calendar calendar = Calendar.getInstance();
+
                 Timestamp currentTimestamp = new Timestamp(calendar.getTime().getTime());
                 String time = new SimpleDateFormat("yy-MM-dd hh:mm").format(currentTimestamp);
 
@@ -183,6 +202,7 @@ public class ChatGUI extends JFrame {
                 MessageClass message = new MessageClass(text, chatRoom);
 
                 try {
+
                     out.writeObject(true);
                     out.writeObject(message);
                 }

@@ -1,3 +1,4 @@
+
 package src;
 
 import java.io.BufferedReader;
@@ -18,7 +19,6 @@ import javax.swing.JTextField;
  * Created by Harry on 05/11/2014.
  */
 public class RegisterLoginThread extends Thread {
-
     Socket s;
 
     String[][] userDataLogIn;
@@ -36,6 +36,7 @@ public class RegisterLoginThread extends Thread {
     }
 
     public void run() {
+
         try (ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(s.getInputStream());) {
 
@@ -58,8 +59,9 @@ public class RegisterLoginThread extends Thread {
                         out.writeObject(user);
                     }
 
-                }
-                else if (message.getMessageType().equals("register")) {
+
+
+                } else if (message.getMessageType().equals("register")) {
                     jFields = (JTextField[]) message.getExtraData();
                     try {
                         getUserDataRegister();
@@ -91,11 +93,10 @@ public class RegisterLoginThread extends Thread {
                     }
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.getMessage();
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
+
             e.getMessage();
         }
     }

@@ -62,6 +62,7 @@ public class ChatRoomClass implements Serializable {
      */
     public String[] toArray() {
         String[] chatRoomInfo = { name, "" + connections, description, "" + votes, topicName };
+
         return chatRoomInfo;
     }
 }

@@ -14,7 +14,6 @@ import java.util.Date;
 public class MessageClass implements Serializable {
 
     private final Object[] extraData;
-
     /** The message itself. */
     String message;
 
@@ -25,6 +24,8 @@ public class MessageClass implements Serializable {
     Date date;
 
     Timestamp timestamp;
+
+    //The type of the message being sent.
     String messageType;
 
     /**

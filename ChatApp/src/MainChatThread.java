@@ -1,3 +1,4 @@
+
 package src;
 
 import java.io.IOException;
@@ -17,7 +18,6 @@ public class MainChatThread extends Thread {
         this.server = server;
 
     }
-
     @Override
     public void run() {
         ChatClientThread ccl;

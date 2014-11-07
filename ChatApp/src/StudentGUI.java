@@ -4,6 +4,8 @@ package src;
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
  */
+//import sun.plugin2.message.Message;
+
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Window;
@@ -36,6 +38,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import src.StudentGUI.TableMouseListener.RightClickMenu;
+
 /**
  * This class is used to create GUI displaying all available chat rooms in their respective topics,
  * allow the user to access a chat room by double clicking on it, create a new chatroom and also
@@ -54,12 +58,15 @@ public class StudentGUI extends JFrame {
 
     /** The user settings button. */
     JButton settingsButton = new JButton("Settings");
+    
+    /** The moderator reports button. */
+    JButton reportsButton = new JButton("Mod Reports");
 
     /** The topics list. */
     JList topicsList = new JList();
 
     /** The chat rooms table. */
-    JTable roomsTable = new JTable();
+    final JTable roomsTable = new JTable();
 
     /** The list model for the list of topics. */
     DefaultListModel listModel = new DefaultListModel();
@@ -188,6 +195,15 @@ public class StudentGUI extends JFrame {
 
         final JPanel southPanel = new JPanel(new FlowLayout());
         createButton.addActionListener(new CreateButtonListener(this));
+        if(user.isAdmin()) {
+        	reportsButton.addActionListener(new ActionListener() {
+        		@Override
+        		public void actionPerformed(ActionEvent e) {
+        			new ModeratorReports();
+        		}
+        	});
+        	southPanel.add(reportsButton);
+        }
         southPanel.add(createButton);
         refreshButton.addActionListener(new RefreshButtonListener(this));
         southPanel.add(refreshButton);
@@ -243,7 +259,6 @@ public class StudentGUI extends JFrame {
             e.printStackTrace();
         }
     }
-
     public class SignoutButtonListener implements ActionListener {
 
         @Override
@@ -341,7 +356,7 @@ public class StudentGUI extends JFrame {
     /**
      * The listener interface for receiving events in the settings button. Opens up a new frame
      * containing the user settings when the button is pressed.
-     * @see SettingsClass
+     * @see src.SettingsClass
      */
     public class SettingsButtonListener implements ActionListener {
 
@@ -358,8 +373,8 @@ public class StudentGUI extends JFrame {
      * The listener interface for receiving events in the chat rooms table. It gets the table row
      * that is selected, using this to get the chat room object from the topics class and using this
      * to open the chat GUI.
-     * @see TopicClass
-     * @see ChatRoomClass
+     * @see src.TopicClass
+     * @see src.ChatRoomClass
      */
     public class TableMouseListener extends MouseAdapter {
 
@@ -480,7 +495,7 @@ public class StudentGUI extends JFrame {
      * The listener used for receiving events from the topics list. Listens for a selection in the
      * topics list: if it detects an event, it will update the rooms table with all the chat rooms
      * from the selected topic.
-     * @see ListSelectionEvent
+     * @see javax.swing.event.ListSelectionEvent
      */
     public class TopicsMouseSelectionListener implements ListSelectionListener {
 

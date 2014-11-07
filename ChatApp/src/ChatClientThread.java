@@ -1,3 +1,4 @@
+
 package src;
 
 import java.io.IOException;
@@ -48,13 +49,11 @@ public class ChatClientThread extends Thread {
 
                 MessageClass initialMessage = (MessageClass) in.readObject();
                 roomName = initialMessage.getRoomName();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
                 System.out.println("I/O failed.");
                 ok = false;
-            }
-            catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -72,33 +71,28 @@ public class ChatClientThread extends Thread {
                             thread.sendMessage(message);
                         }
                     }
-                }
-
-                catch (IOException e) {
+                } catch (IOException e) {
                     ok = false;
                     // System.out.println("Read failed.");
-                }
-                catch (ClassNotFoundException e) {
+                } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
             }
+            ArrayList<ChatClientThread> clientWorkers = MainChatThread.getClientThreads();
+            clientWorkers.remove(index);
+            for (int i = index; i < clientWorkers.size(); i++) {
+                clientWorkers.get(i).index--;
+            }
+            try {
+                out.close();
+                in.close();
+                socket.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            MainChatThread.count--;
         }
-        ArrayList<ChatClientThread> clientWorkers = MainChatThread.getClientThreads();
-        clientWorkers.remove(index);
-        for (int i = index; i < clientWorkers.size(); i++) {
-            clientWorkers.get(i).index--;
-        }
-        try {
-            out.close();
-            in.close();
-            socket.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        MainChatThread.count--;
     }
 
     private String getRoomName() {

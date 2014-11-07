@@ -5,7 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.ObjectInputStream;
@@ -89,18 +88,17 @@ public class LoginGUI extends JFrame {
                     String idFieldText = studentIDField.getText();
                     String passFieldText = new String(passField.getPassword());
 
-                    MessageClass message = new MessageClass("log_in", idFieldText,
-                            new Object[] { passFieldText });
+                    MessageClass message = new MessageClass("log_in", idFieldText, new Object[]{passFieldText});
 
                     out.writeObject(message);
 
-                    // out.println(studentIDField.getText());
-                    // out.println(new String(passField.getPassword()));
-                    //
-                    // boolean loginConfirm = (boolean) in.readObject();
+                    //out.println(studentIDField.getText());
+                    //out.println(new String(passField.getPassword()))
+
+                    //boolean loginConfirm = (boolean) in.readObject();
 
                     MessageClass loginConfirm = (MessageClass) in.readObject();
-                    
+
                     if (loginConfirm.getMessage().equals("true")) {
                         UserClass user = (UserClass) in.readObject();
                         new StudentGUI(user);
