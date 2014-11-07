@@ -14,8 +14,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -98,7 +96,7 @@ public class StudentGUI extends JFrame {
 
     UserClass user;
 
-    Socket s;
+    Socket socket;
 
     ObjectOutputStream out;
 
@@ -107,13 +105,20 @@ public class StudentGUI extends JFrame {
     /**
      * Instantiates a new student class.
      */
-    public StudentGUI(final UserClass user) {
+    public StudentGUI(Socket socketIn, ObjectInputStream inIn, ObjectOutputStream outIn, final UserClass user) {
+        this.socket = socketIn;
+        this.out = outIn;
+        this.in = inIn;
+        this.user = user;
+
+
+        //System.out.println("socket.isClosed() = " + socket.isClosed());
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(500, 600);
         setLocationRelativeTo(null);
         setLayout();
         setVisible(true);
-        this.user = user;
     }
 
     /**
@@ -121,13 +126,6 @@ public class StudentGUI extends JFrame {
      */
     public void setLayout() {
 
-        try {
-            s = new Socket("localhost", 4458);
-            out = new ObjectOutputStream(s.getOutputStream());
-            in = new ObjectInputStream(s.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(0, 20));
@@ -206,6 +204,8 @@ public class StudentGUI extends JFrame {
 
         getTopicsFromServer();
 
+        System.out.println("socket = " + socket.isClosed());
+
 
     }
 
@@ -227,6 +227,8 @@ public class StudentGUI extends JFrame {
     }
 
     public void sendTopicsToServer(ArrayList<TopicClass> topics, DefaultListModel topicsListModel) {
+        while(socket == null) {
+        }
         try {
             out.writeObject(new MessageClass("send_topics", "whatever"));
             out.writeObject(topics);
@@ -240,6 +242,7 @@ public class StudentGUI extends JFrame {
     public void getTopicsFromServer() {
         try {
             out.writeObject(new MessageClass("get_topics", "whatever"));
+            out.flush();
             setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
             setTopicsJListModel((DefaultListModel) in.readObject());
         } catch (IOException e) {
@@ -327,6 +330,7 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
+            System.out.println("socket.isClosed() = " + socket.isClosed());
             if (!searchField.getText().equals("")) {
                 final ArrayList<ChatRoomClass> results = getResults(searchField.getText()
                         .toLowerCase());
@@ -357,7 +361,7 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            this.settingsFrame = new SettingsClass(user);
+            this.settingsFrame = new SettingsClass(socket, in, out, user);
         }
     }
 
@@ -484,7 +488,14 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ui.getTopicsFromServer();;
+            ui.getTopicsFromServer();
         }
+    }
+
+
+    public void setConnection(Socket socket, ObjectOutputStream out, ObjectInputStream in) {
+        this.socket = socket;
+        this.out = out;
+        this.in = in;
     }
 }

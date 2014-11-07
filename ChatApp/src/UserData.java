@@ -221,4 +221,102 @@ public class UserData {
     public UserClass getUserClass() {
         return user;
     }
+
+    public int updateInfo(UserClass settingsUser, JTextField[] settingsFields) {
+
+        int confirmation = 0;
+        final File csvFile = new File("users.csv");
+        final File tempFile = new File("temp.csv");
+
+        String line = "";
+        final String splitBy = ",";
+        BufferedReader br = null;
+        PrintWriter pw = null;
+
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            pw = new PrintWriter(new FileWriter(tempFile));
+
+            while ((line = br.readLine()) != null) {
+                final String[] temp = line.split(splitBy);
+                if (temp[1].equals(settingsUser.getID())) {
+                    continue;
+                }
+                pw.println(line);
+            }
+
+            pw.print("0");
+            pw.print(",");
+            pw.print(settingsUser.getID());
+            pw.print(",");
+
+            if (!settingsFields[0].getText().equals("")) {
+                pw.print(settingsFields[0].getText());
+                settingsUser.setName(settingsFields[0].getText());
+                confirmation = 1;
+            }
+            else {
+                pw.print(settingsUser.getName());
+            }
+
+            pw.print(",");
+            if (!(settingsFields[1].getText().equals(""))) {
+                if (settingsFields[1].getText().equals(settingsFields[2].getText())) {
+                    pw.print(settingsFields[1].getText());
+                    settingsUser.setPassword(settingsFields[1].getText());
+                    confirmation = 1;
+                }
+                else {
+                    JOptionPane.showMessageDialog(new JFrame(), "Password fields don't match!");
+                    settingsFields[1].setText("");
+                    settingsFields[2].setText("");
+                }
+            }
+            else {
+                pw.print(settingsUser.getPassword());
+            }
+
+            pw.print(",");
+            if (!settingsFields[3].getText().equals("")) {
+                pw.print(settingsFields[3].getText());
+                settingsUser.setQuestion(settingsFields[3].getText());
+                confirmation = 1;
+            }
+            else {
+                pw.print(settingsUser.getQuestion());
+            }
+
+            pw.print(",");
+            if (!settingsFields[4].getText().equals("")) {
+                pw.print(settingsFields[4].getText());
+                settingsUser.setAnswer(settingsFields[4].getText());
+                confirmation = 1;
+            }
+            else {
+                pw.print(settingsUser.getAnswer());
+            }
+            pw.println();
+
+        }
+        catch (final Exception ex) {
+            ex.printStackTrace();
+            confirmation = 2;
+        }
+        finally {
+            try {
+                br.close();
+            }
+            catch (final IOException e1) {
+                e1.printStackTrace();
+            }
+            pw.close();
+        }
+        csvFile.delete();
+        boolean success = tempFile.renameTo(new File("users.csv"));
+        System.out.println(success);
+        System.out.println("tempFile = " + tempFile.getName());
+
+        System.out.println("userDataFile = " + userDataFile.getAbsoluteFile());
+        return confirmation;
+    }
 }

@@ -48,7 +48,7 @@ class ForgottenPasswordFrame extends JFrame implements ActionListener {
      * remember his password. If the user answers to the secret question correctly, then the
      * password appears underneath the answer, else the user is notified the the answer is wrong.
      * @param password
-     *        is the user's forgotten password.
+     *        is the user'socket forgotten password.
      * @param question
      *        is the secret question that the student introduced when was filling the registration
      *        form.

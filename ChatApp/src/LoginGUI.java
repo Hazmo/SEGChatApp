@@ -7,10 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 import javax.swing.BorderFactory;
@@ -36,10 +33,22 @@ public class LoginGUI extends JFrame {
             + "</u></b></html>");
     File csvFile = new File("users.csv");
 
+    Socket loginSocket;
+    ObjectOutputStream out;
+    ObjectInputStream in;
+
     /**
      * Default constructor
      */
     public LoginGUI() {
+
+        try {
+            this.loginSocket = new Socket("localhost", 4455);
+            this.out = new ObjectOutputStream(loginSocket.getOutputStream());
+            this.in = new ObjectInputStream(loginSocket.getInputStream());
+        } catch (IOException e) {
+            e.getMessage();
+        }
         setTitle("Log in");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout();
@@ -83,9 +92,7 @@ public class LoginGUI extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                try (Socket login = new Socket("localhost", 4455);
-                        ObjectOutputStream out = new ObjectOutputStream(login.getOutputStream());
-                        ObjectInputStream in = new ObjectInputStream(login.getInputStream());) {
+                try {
                     String idFieldText = studentIDField.getText();
                     String passFieldText = new String(passField.getPassword());
 
@@ -102,8 +109,10 @@ public class LoginGUI extends JFrame {
 
                     if (loginConfirm.getMessage().equals("true")) {
                         UserClass user = (UserClass) in.readObject();
-                        new StudentGUI(user);
+                        StudentGUI studentGUI = new StudentGUI(loginSocket, in, out, user);
+                        //studentGUI.setConnection(login, out, in);
                         dispose();
+                        //setVisible(false);
                     }
                     else {
                         JOptionPane.showMessageDialog(null,

@@ -13,22 +13,22 @@ import java.util.Scanner;
 public class RegisterLoginThread extends Thread{
 
     Socket s;
+    RegisterLoginServerThread server;
 
-    String[][] userDataLogIn;
+
+    //RegisterLogin Variables
     String studentID;
     String password;
-    File users;
     UserClass user;
-
-
     JTextField[] jFields = new JTextField[6];
     String[][] userDataRegister;
     static boolean ok = false;
-
-
     UserData userData = new UserData("users.csv");
 
-    public RegisterLoginThread(Socket s) {
+
+
+    public RegisterLoginThread(RegisterLoginServerThread server, Socket s) {
+        this.server = server;
         this.s = s;
     }
 
@@ -39,10 +39,21 @@ public class RegisterLoginThread extends Thread{
 
             while (true) {
 
+                System.out.println("s.isClosed() = " + s.isClosed());
+
                 MessageClass message = (MessageClass) in.readObject();
 
-                if (message.getMessageType().equals("log_in")) {
+                if (message.getMessageType().equals("get_topics")) {
+                    System.out.println("inside");
+                    out.writeObject(server.getTopics());
+                    out.writeObject(server.getTopicsModel());
 
+                } else if (message.getMessageType().equals("send_topics")) {
+                    System.out.println("inside send");
+                    server.setTopics((ArrayList<TopicClass>) in.readObject());
+                    server.setTopicsModel((DefaultListModel) in.readObject());
+
+                } else if (message.getMessageType().equals("log_in")) {
                     studentID = message.getMessage();
                     password = (String) message.getExtraData()[0];
                     System.out.println("studentID = " + studentID);
@@ -50,14 +61,12 @@ public class RegisterLoginThread extends Thread{
 
                     boolean loggedIn = userData.loginUser(studentID, password);
 
-
                     System.out.println("Boolean.toString(loggedIn) = " + Boolean.toString(loggedIn));
                     out.writeObject(new MessageClass("logged_in", Boolean.toString(loggedIn)));
                     if (loggedIn) {
                         user = userData.getUserClass();
                         out.writeObject(user);
                     }
-
 
                 } else if (message.getMessageType().equals("register")) {
                     jFields = (JTextField[]) message.getExtraData();
@@ -89,7 +98,15 @@ public class RegisterLoginThread extends Thread{
                         out.writeObject(registered);
                         ok = true;
                     }
+                } else if(message.getMessageType().equals("update_settings")) {
+                    JTextField settingsFields[] = (JTextField[]) in.readObject();
+                    for(JTextField settings : settingsFields) {
+                        System.out.println("settings. = " + settings.getText());
+                    }
+                    UserClass settingsUser = (UserClass) in.readObject();
+                    out.writeObject(userData.updateInfo(settingsUser, settingsFields));
                 }
+
             }
         } catch (IOException e) {
             e.getMessage();
@@ -97,196 +114,6 @@ public class RegisterLoginThread extends Thread{
             e.getMessage();
         }
     }
-
-
-    /**
-
-    public boolean loginUser(String studentID, String password) {
-        userDataLogIn = userData.getUserDataLogIn();
-
-        for (String[] row : userDataLogIn) {
-            if (row[1].equals(studentID) && row[3].equals(password)) {
-                String[] userTmp = getUser();
-                user = new UserClass(userTmp);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public String[] getUser() {
-        for (String[] row : userDataLogIn) {
-            if (row[1].equals(studentID)) {
-                String[] userInf = new String[6];
-                userInf[0] = row[0];
-                userInf[1] = row[1];
-                userInf[2] = row[2];
-                userInf[3] = row[3];
-                userInf[4] = row[4];
-                userInf[5] = row[5];
-                return userInf;
-            }
-        }
-        return new String[6];
-    }
-
-
-    public void getUserDataLogIn() {
-        users = new File("users.csv");
-
-        int count = 0;
-        Scanner sc;
-        try {
-            sc = new Scanner(users);
-            while (sc.hasNextLine()) {
-                count++;
-                sc.nextLine();
-            }
-
-            sc.close();
-        }
-        catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-        }
-
-        userDataLogIn = new String[count][6];
-
-        String csvFile = "users.csv";
-        BufferedReader br = null;
-        String line = "";
-        String csvSplitBy = ",";
-
-        try {
-            br = new BufferedReader(new FileReader(csvFile));
-            int count2 = 0;
-            while ((line = br.readLine()) != null) {
-                String[] temp = line.split(csvSplitBy);
-                userDataLogIn[count2][0] = temp[0];
-                userDataLogIn[count2][1] = temp[1];
-                userDataLogIn[count2][2] = temp[2];
-                userDataLogIn[count2][3] = temp[3];
-                userDataLogIn[count2][4] = temp[4];
-                userDataLogIn[count2][5] = temp[5];
-                count2++;
-            }
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (br != null) {
-                try {
-                    br.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public int registerUser() {
-        FileWriter registrationFileWriter = null;
-        try {
-            registrationFileWriter = new FileWriter("users.csv", true);
-        }
-        catch (IOException e1) {
-            e1.printStackTrace();
-            return 2;
-        }
-
-        PrintWriter toFileWriter = new PrintWriter(registrationFileWriter);
-
-        toFileWriter.print("0");
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[1].getText().toLowerCase());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[0].getText());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[2].getText());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[4].getText());
-        toFileWriter.print(",");
-        toFileWriter.print(jFields[5].getText().toLowerCase());
-        toFileWriter.println();
-
-        toFileWriter.flush();
-
-        toFileWriter.close();
-
-        try {
-            registrationFileWriter.close();
-        }
-        catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        return 1;
-    }
-
-    /**
-     * Method to get the data from the users csv file
-     */
-
-    /*
-    public void getUserDataRegister() {
-        users = new File("users.csv");
-
-        int count = 0;
-        Scanner sc;
-        try {
-            sc = new Scanner(users);
-            while (sc.hasNextLine()) {
-                count++;
-                sc.nextLine();
-            }
-
-            sc.close();
-        }
-        catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-        }
-
-        userDataRegister = new String[count][4];
-
-        String csvFile = "users.csv";
-        BufferedReader br = null;
-        String line = "";
-        String csvSplitBy = ",";
-
-        try {
-            br = new BufferedReader(new FileReader(csvFile));
-            int count2 = 0;
-            while ((line = br.readLine()) != null) {
-                String[] temp = line.split(csvSplitBy);
-                userDataRegister[count2][0] = temp[1];
-                userDataRegister[count2][1] = temp[3];
-                userDataRegister[count2][2] = temp[4];
-                userDataRegister[count2][3] = temp[5];
-                count2++;
-            }
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (br != null) {
-                try {
-                    br.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-    */
 
 
 }
