@@ -139,7 +139,7 @@ public class LoginGUI extends JFrame {
         forgottenPassLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new ForgottenPasswordFrame();
+                new ForgottenPasswordFrame(loginSocket, out, in);
             }
         });
     }

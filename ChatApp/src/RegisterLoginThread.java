@@ -19,7 +19,7 @@ public class RegisterLoginThread extends Thread{
     //RegisterLogin Variables
     String studentID;
     String password;
-    UserClass user;
+    UserClass user = null;
     JTextField[] jFields = new JTextField[6];
     String[][] userDataRegister;
     static boolean ok = false;
@@ -39,9 +39,10 @@ public class RegisterLoginThread extends Thread{
 
             while (true) {
 
-                System.out.println("s.isClosed() = " + s.isClosed());
-
                 MessageClass message = (MessageClass) in.readObject();
+                if (user != null) {
+                    System.out.println(message.getMessageType() + " " + user.getID());
+                }
 
                 if (message.getMessageType().equals("get_topics")) {
                     System.out.println("inside");
@@ -73,8 +74,7 @@ public class RegisterLoginThread extends Thread{
                     try {
                         userDataRegister = userData.getUserDataRegister();
                         ok = true;
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         ok = false;
                     }
                     if (ok == true) {
@@ -87,27 +87,45 @@ public class RegisterLoginThread extends Thread{
                         }
                         if (duplicate == true) {
                             out.writeObject(4);
-                        }
-                        else {
+                        } else {
                             int registered = userData.registerUser(jFields);
                             out.writeObject(registered);
                         }
-                    }
-                    else {
+                    } else {
                         int registered = userData.registerUser(jFields);
                         out.writeObject(registered);
                         ok = true;
                     }
-                } else if(message.getMessageType().equals("update_settings")) {
+                } else if (message.getMessageType().equals("update_settings")) {
                     JTextField settingsFields[] = (JTextField[]) in.readObject();
-                    for(JTextField settings : settingsFields) {
+                    for (JTextField settings : settingsFields) {
                         System.out.println("settings. = " + settings.getText());
                     }
                     UserClass settingsUser = (UserClass) in.readObject();
                     out.writeObject(userData.updateInfo(settingsUser, settingsFields));
-                }
 
+
+                } else if (message.getMessageType().equals("forgot_password")) {
+
+
+                    Object input = in.readObject();
+                    boolean confirm = userData.validateID(((JLabel) input).getText());
+                    out.writeObject(confirm);
+                    if (confirm) {
+                        out.writeObject(userData.getForgottenQuestion());
+                    }
+
+                } else if (message.getMessage().equals("get_password")) {
+                    Object input = in.readObject();
+                    System.out.println("just started");
+                    if (input.equals(userData.getForgottenAnswer())) {
+                        out.writeObject(userData.getForgottenPassword());
+                    }
+
+                    System.out.println("Past this");
+                }
             }
+
         } catch (IOException e) {
             e.getMessage();
         } catch (ClassNotFoundException e) {

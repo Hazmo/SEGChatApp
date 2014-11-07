@@ -16,6 +16,10 @@ public class UserData {
     UserClass user;
 
 
+    String forgottenPassword;
+    String forgottenQuestion;
+    String forgottenAnswer;
+
     JTextField[] jFields = new JTextField[6];
     String[][] userDataRegister;
     static boolean ok = false;
@@ -312,11 +316,84 @@ public class UserData {
             pw.close();
         }
         csvFile.delete();
-        boolean success = tempFile.renameTo(new File("users.csv"));
-        System.out.println(success);
-        System.out.println("tempFile = " + tempFile.getName());
+        tempFile.renameTo(new File("users.csv"));
 
-        System.out.println("userDataFile = " + userDataFile.getAbsoluteFile());
         return confirmation;
+    }
+
+    public boolean validateID(String userID) {
+
+        File users = new File("users.csv");
+        int count = 0;
+        Scanner sc;
+        try {
+            sc = new Scanner(users);
+            while (sc.hasNextLine()) {
+                count++;
+                sc.nextLine();
+            }
+
+            sc.close();
+        }
+        catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+
+        String[][] userData = new String[count][4];
+
+        String csvFile = "users.csv";
+        BufferedReader br = null;
+        String line = "";
+        String csvSplitBy = ",";
+
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            int count2 = 0;
+            while ((line = br.readLine()) != null) {
+                String[] temp = line.split(csvSplitBy);
+                userData[count2][0] = temp[1];
+                userData[count2][1] = temp[3];
+                userData[count2][2] = temp[4];
+                userData[count2][3] = temp[5];
+                count2++;
+            }
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (br != null) {
+                try {
+                    br.close();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        for (int i = 0; i < count; i++) {
+            if ((userID.equals(userData[i][0]))) {
+                forgottenPassword = userData[i][1];
+                forgottenQuestion = userData[i][2];
+                forgottenAnswer = userData[i][3];
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getForgottenPassword() {
+        return forgottenPassword;
+    }
+
+    public String getForgottenQuestion() {
+        return forgottenQuestion;
+    }
+
+    public String getForgottenAnswer() {
+        return forgottenAnswer;
     }
 }
