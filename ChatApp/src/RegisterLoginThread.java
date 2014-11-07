@@ -40,6 +40,7 @@ public class RegisterLoginThread extends Thread{
             while (true) {
 
                 MessageClass message = (MessageClass) in.readObject();
+
                 if (user != null) {
                     System.out.println(message.getMessageType() + " " + user.getID());
                 }
@@ -115,17 +116,14 @@ public class RegisterLoginThread extends Thread{
                         out.writeObject(userData.getForgottenQuestion());
                     }
 
-                } else if (message.getMessage().equals("get_password")) {
+                } else if (message.getMessageType().equals("get_password")) {
                     Object input = in.readObject();
-                    System.out.println("just started");
+
                     if (input.equals(userData.getForgottenAnswer())) {
                         out.writeObject(userData.getForgottenPassword());
                     }
-
-                    System.out.println("Past this");
                 }
             }
-
         } catch (IOException e) {
             e.getMessage();
         } catch (ClassNotFoundException e) {
