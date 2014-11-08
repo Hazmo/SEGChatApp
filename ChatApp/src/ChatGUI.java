@@ -1,10 +1,7 @@
 package src;
 
-import java.awt.AWTException;
+import java.awt.*;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Robot;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -53,6 +50,7 @@ public class ChatGUI extends JFrame {
 
     ChatRoomClass chatRoom;
     UserClass user;
+    String color;
 
     public ChatGUI(final ChatRoomClass chatRoom, UserClass user) {
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
@@ -69,7 +67,44 @@ public class ChatGUI extends JFrame {
         enterText.setColumns(10);
         SwingUtilities.getRootPane(this).setDefaultButton(send);
 
-        rightClickOption();
+        chatWindow.addMouseListener(new MouseAdapter(){
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+                if (SwingUtilities.isRightMouseButton(e)) {
+
+                    Point p = e.getPoint();
+                    chatWindow.setSelectedIndex(chatWindow.locationToIndex(p));
+                    if (chatWindow.isSelectionEmpty()==false) {
+                        RightClickMenu menu = new RightClickMenu();
+                        menu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+
+            /**
+             * class with the constructor that creates menu on right mouse click.
+             */
+            class RightClickMenu extends JPopupMenu {
+                JMenuItem reportItem;
+
+                public RightClickMenu() {
+                    this.reportItem = new JMenuItem("Report");
+                    this.add(this.reportItem);
+                    this.reportItem.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String messageTitle =chatWindow.getSelectedValue().toString();
+                            new UserReport("message", messageTitle);
+                        }
+                    });
+                }
+            }
+
+        });
+
+        selectColor();
         sendMessageListener();
         setLayout();
 
@@ -94,7 +129,24 @@ public class ChatGUI extends JFrame {
         MessageThread t = new MessageThread(in, chatWindow, chatModel);
         t.start();
     }
-
+    private void selectColor() {
+        int rnd = (int)(Math.random() * ((12) + 1));
+        switch(rnd) {
+            case 0: color = "Blue"; break;
+            case 1: color = "Aqua"; break;
+            case 2: color = "Fuchsia"; break;
+            case 3: color = "Gray"; break;
+            case 4: color = "Green"; break;
+            case 5: color = "Lime"; break;
+            case 6: color = "Maroon"; break;
+            case 7: color = "Navy"; break;
+            case 8: color = "Olive"; break;
+            case 9: color = "Purple"; break;
+            case 10: color = "Red"; break;
+            case 11: color = "Teal"; break;
+            case 12: color = "Yellow"; break;
+        }
+    }
     public void setLayout() {
         JPanel center = new JPanel(new BorderLayout());
 
@@ -141,50 +193,7 @@ public class ChatGUI extends JFrame {
         }
     }
     
-    public void rightClickOption(){
-        class RightClickMenu extends JPopupMenu {
-            JMenuItem reportItem;
-            JMenuItem deleteMsg;
 
-            public RightClickMenu(final MouseEvent a) {
-            	final int r = chatWindow.locationToIndex(a.getPoint());
-            	chatWindow.setSelectedIndex(r);
-            	final String source = (String) chatWindow.getSelectedValue();
-            	
-            	if(user.isAdmin()) {
-            		this.deleteMsg = new JMenuItem("Delete Message");
-            		this.add(this.deleteMsg);
-            		this.deleteMsg.addActionListener(new ActionListener() {
-            			@Override
-            			public void actionPerformed(ActionEvent e) {
-            				chatWindow.remove(r);
-            				
-            			}
-            		});          		
-            	}
-
-                this.reportItem = new JMenuItem("Report");
-                this.add(this.reportItem);
-                this.reportItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        new UserReport(user, source);
-                    }
-                });
-            }
-        }
-        chatWindow.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    RightClickMenu menu = new RightClickMenu(e);
-                    menu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
-    }
 
     public void sendMessageListener() {
         send.addActionListener(new ActionListener() {
@@ -197,8 +206,10 @@ public class ChatGUI extends JFrame {
                 Timestamp currentTimestamp = new Timestamp(calendar.getTime().getTime());
                 String time = new SimpleDateFormat("yy-MM-dd hh:mm").format(currentTimestamp);
 
-                String text = user.getName() + " (" + time + ") : " + enterText.getText();
-
+                String text = "<html><font color=\""+ color+"\">"+user.getName() + " (" + time + ") : </font>" + enterText.getText() + "</html>";
+                if (enterText.getText().equals("")) {
+                    return;
+                }
                 MessageClass message = new MessageClass(text, chatRoom);
 
                 try {

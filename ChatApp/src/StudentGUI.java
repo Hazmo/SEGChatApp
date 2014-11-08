@@ -19,19 +19,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -218,7 +206,7 @@ public class StudentGUI extends JFrame {
     /**
      * Adds the new chatroom to the chatroom ArrayList
      * @param ChatRoomClass
-     * @see CreateChatDialog
+     * @see src.CreateChatDialog
      */
     public void addChatToList(final ChatRoomClass chat) {
         this.chatRooms.add(chat);
@@ -264,7 +252,7 @@ public class StudentGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             System.gc();
-            for (java.awt.Window window : Window.getWindows()) {
+            for (Window window : Window.getWindows()) {
                 window.dispose();
             }
             new LoginGUI();
@@ -356,7 +344,7 @@ public class StudentGUI extends JFrame {
     /**
      * The listener interface for receiving events in the settings button. Opens up a new frame
      * containing the user settings when the button is pressed.
-     * @see src.SettingsClass
+     * @see SettingsClass
      */
     public class SettingsButtonListener implements ActionListener {
 
@@ -373,52 +361,41 @@ public class StudentGUI extends JFrame {
      * The listener interface for receiving events in the chat rooms table. It gets the table row
      * that is selected, using this to get the chat room object from the topics class and using this
      * to open the chat GUI.
-     * @see src.TopicClass
-     * @see src.ChatRoomClass
+     * @see TopicClass
+     * @see ChatRoomClass
      */
     public class TableMouseListener extends MouseAdapter {
 
         @Override
         public void mouseClicked(final MouseEvent e) {
-            if (e.getClickCount() == 2) {
+            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
                 int rowIndex = roomsTable.getSelectedRow();
-                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 4);
+                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 3);
                 for (TopicClass topic : topicsClasses) {
                     if (topic.toString().equals(topicString)) {
                         for (ChatRoomClass chatRoom : topic.getChatRooms()) {
                             if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
-                                new ChatGUI(chatRoom, user);
-                                System.out.println("" + chatRoom.votes);
+                                new ChatGUI(chatRoom, StudentGUI.this.user);
                                 break;
                             }
+
                         }
                         break;
                     }
                 }
+
+            } else if (SwingUtilities.isRightMouseButton( e )) {
+                int rowNumber = roomsTable.rowAtPoint(e.getPoint());
+                ListSelectionModel chatLSModel = roomsTable.getSelectionModel();
+                chatLSModel.setSelectionInterval(rowNumber, rowNumber);
+                if (chatLSModel.isSelectionEmpty()==false) {
+                    RightClickMenu menu = new RightClickMenu(chatLSModel);
+                    menu.show(e.getComponent(), e.getX(), e.getY());
+                }
             }
         }
 
-        /**
-         * @param e
-         */
-        @Override
-        public void mouseReleased(final MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                this.doPop(e);
-            }
-        }
 
-        /**
-         * creates a menu and shows it at the place where the current mouse location is
-         * @param e
-         *        mouse event
-         */
-        private void doPop(final MouseEvent e) {
-            final RightClickMenu menu = new RightClickMenu();
-            menu.show(e.getComponent(), e.getX(), e.getY());
-            roomsTable.setRowSelectionInterval(roomsTable.rowAtPoint(e.getPoint()),
-                    roomsTable.rowAtPoint(e.getPoint()));
-        }
 
         /**
          * class with the constructor that creates menu on right mouse click.
@@ -428,9 +405,16 @@ public class StudentGUI extends JFrame {
             JMenuItem upvoteItem;
             JMenuItem downVoteItem;
 
-            public RightClickMenu() {
+            public RightClickMenu(final ListSelectionModel chatLSModel) {
                 reportItem = new JMenuItem("Report");
                 add(reportItem);
+                reportItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString());
+                    }
+                });
                 upvoteItem = new JMenuItem("Upvote");
                 add(upvoteItem);
                 upvoteItem.addActionListener(this);
