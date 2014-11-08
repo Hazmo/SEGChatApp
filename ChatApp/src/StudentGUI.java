@@ -95,12 +95,15 @@ public class StudentGUI extends JFrame {
      * Instantiates a new student class.
      */
     public StudentGUI(final UserClass user) {
+
+        this.user = user;
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(500, 600);
         setLocationRelativeTo(null);
         setLayout();
         setVisible(true);
-        this.user = user;
+
     }
 
     /**
@@ -183,6 +186,7 @@ public class StudentGUI extends JFrame {
 
         final JPanel southPanel = new JPanel(new FlowLayout());
         createButton.addActionListener(new CreateButtonListener(this));
+
         if(user.isAdmin()) {
         	reportsButton.addActionListener(new ActionListener() {
         		@Override
