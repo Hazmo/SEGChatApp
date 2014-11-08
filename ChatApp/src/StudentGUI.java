@@ -412,15 +412,17 @@ public class StudentGUI extends JFrame {
             JMenuItem downVoteItem;
 
             public RightClickMenu(final ListSelectionModel chatLSModel) {
-                reportItem = new JMenuItem("Report");
-                add(reportItem);
-                reportItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-
-                        new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString(), user.getName(), socket, out, in);
-                    }
-                });
+                if (!user.isAdmin()) {
+                    reportItem = new JMenuItem("Report");
+                    add(reportItem);
+                    reportItem.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString(), user.getName(), socket, out, in);
+                        }
+                    });
+                }
+                
                 upvoteItem = new JMenuItem("Upvote");
                 add(upvoteItem);
                 upvoteItem.addActionListener(this);
