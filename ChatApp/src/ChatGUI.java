@@ -1,8 +1,11 @@
 package src;
 
 import java.awt.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -54,18 +57,16 @@ public class ChatGUI extends JFrame {
         this.chatRoom = chatRoom;
         this.user = user;
 
-        setTitle(chatRoom.toString());
 
+        setTitle(chatRoom.toString());
         chatWindow.setModel(chatModel);
 
         userWindow.setModel(userModel);
         userModel.addElement(user.getName());
-        
+
         enterText.setColumns(10);
-        
         SwingUtilities.getRootPane(this).setDefaultButton(send);
-        
-        //rightClickOption();
+
         chatWindow.addMouseListener(new MouseAdapter(){
 
             @Override
@@ -104,19 +105,19 @@ public class ChatGUI extends JFrame {
         });
 
         selectColor();
-        System.out.println("selected color: "+ color);
         sendMessageListener();
         setLayout();
-        
+
         setVisible(true);
         setSize(500, 500);
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 try {
-                    socket.close();
+                    out.writeObject(false);
                     in.close();
                     out.close();
+                    socket.close();
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
@@ -127,9 +128,7 @@ public class ChatGUI extends JFrame {
         listenSocket();
         MessageThread t = new MessageThread(in, chatWindow, chatModel);
         t.start();
-
     }
-
     private void selectColor() {
         int rnd = (int)(Math.random() * ((12) + 1));
         switch(rnd) {
@@ -146,40 +145,21 @@ public class ChatGUI extends JFrame {
             case 10: color = "Red"; break;
             case 11: color = "Teal"; break;
             case 12: color = "Yellow"; break;
-//            case 13: color = "DarkOrchid"; break;
-//            case 14: color = "DarkOliveGreen"; break;
-//            case 15: color = "DarkOrange"; break;
-//            case 16: color = "DarkRed"; break;
-//            case 17: color = "DarkSlateBlue"; break;
-//            case 18: color = "DarkViolet"; break;
-//            case 19: color = "DarkPink"; break;
-//            case 20: color = "ForestGreen"; break;
-//            case 21: color = "Gold"; break;
-//            case 22: color = "HotPink"; break;
-//            case 23: color = "Indigo"; break;
-//            case 24: color = "MediumSeaGreen"; break;
-//            case 25: color = "Olive"; break;
-//            case 26: color = "OrangeRed"; break;
-//            case 27: color = "Orchid"; break;
-//            case 28: color = "Purple"; break;
-//            case 29: color = "Red"; break;
-//            case 30: color = "RoyalBlue"; break;
         }
     }
-
-    public void setLayout(){
+    public void setLayout() {
         JPanel center = new JPanel(new BorderLayout());
-        
+
         JPanel centerWindow = new JPanel(new BorderLayout());
         centerWindow.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         centerWindow.add(jsp, BorderLayout.CENTER);
         center.add(centerWindow, BorderLayout.CENTER);
-        
+
         JPanel eastWindow = new JPanel(new BorderLayout());
         eastWindow.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 20));
         eastWindow.add(jsp2, BorderLayout.CENTER);
         center.add(eastWindow, BorderLayout.EAST);
-        
+
         JPanel jp = new JPanel(new FlowLayout());
 
         jp.add(enterText);
@@ -213,15 +193,18 @@ public class ChatGUI extends JFrame {
         }
     }
     
-    public void sendMessageListener(){
+
+
+    public void sendMessageListener() {
         send.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 Calendar calendar = Calendar.getInstance();
-            	Timestamp currentTimestamp = new Timestamp(calendar.getTime().getTime());
-            	String time = new SimpleDateFormat("yy-MM-dd hh:mm").format(currentTimestamp);
+
+                Timestamp currentTimestamp = new Timestamp(calendar.getTime().getTime());
+                String time = new SimpleDateFormat("yy-MM-dd hh:mm").format(currentTimestamp);
 
                 String text = "<html><font color=\""+ color+"\">"+user.getName() + " (" + time + ") : </font>" + enterText.getText() + "</html>";
                 if (enterText.getText().equals("")) {
@@ -230,6 +213,8 @@ public class ChatGUI extends JFrame {
                 MessageClass message = new MessageClass(text, chatRoom);
 
                 try {
+
+                    out.writeObject(true);
                     out.writeObject(message);
                 }
                 catch (IOException e1) {

@@ -1,15 +1,44 @@
+
 package src;
 
-import javax.swing.*; import java.awt.*; import java.awt.event.ActionEvent; import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-/** * Created by Ainura on 03.11.2014. */ class UserReport extends JFrame implements ActionListener{
-JLabel question;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+/**
+ * Created by Ainura on 03.11.2014.
+ */
+
+/** * Created by Ainura on 03.11.2014. */
+class UserReport extends JFrame implements ActionListener{
+    JLabel question;
     String questionString= "What would you like to report about?";
     JComponent answer = new JTextField(30);
     JTextArea detailsTextArea;
+    String title;
+    UserClass user;
+    String reportTitle;
 
     UserReport() {
         addLayout();
+        reportTitle = ((JTextField)answer).getText().toString();
     }
     UserReport(String reportObject, String reportObjectValue) {
         questionString = "You are reporting about the following "+ reportObject;
@@ -17,6 +46,7 @@ JLabel question;
         answer.setForeground(Color.blue);
         answer.setBackground(Color.lightGray);
         addLayout();
+        reportTitle = reportObjectValue;
     }
     public void addLayout() {
         setTitle("Report");
@@ -67,7 +97,23 @@ JLabel question;
         } else {
             this.dispose();
         }
-    } private void submitReport() {
-
+    }
+    private void submitReport() {
+    	String userName = user.getName();
+    	String reportMessage = detailsTextArea.getText().toString();
+    	
+    	ReportClass report = new ReportClass(userName, reportTitle, reportMessage, title);
+    	
+    	try(Socket reportSocket = new Socket("localhost", 4459);
+            ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
+    		BufferedReader in = new BufferedReader(new InputStreamReader(reportSocket.getInputStream()));
+    	){
+    		out.writeObject(new String("ADD"));
+    		out.writeObject(report);
+    		JOptionPane.showMessageDialog(null, in.readLine());
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
 }
+
