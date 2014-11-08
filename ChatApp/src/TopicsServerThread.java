@@ -1,5 +1,5 @@
-
 package src;
+
 import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,7 +32,7 @@ public class TopicsServerThread extends Thread {
     }
 
     public void run() {
-        while(true) {
+        while (true) {
             try {
                 TopicsThread tt = new TopicsThread(this, server.accept());
                 tt.start();
@@ -41,7 +41,6 @@ public class TopicsServerThread extends Thread {
             }
         }
     }
-
 
     public synchronized ArrayList<TopicClass> getTopics() {
         return topics;
@@ -59,3 +58,4 @@ public class TopicsServerThread extends Thread {
         topicsModel = topicsModelSent;
     }
 }
+

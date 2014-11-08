@@ -1,4 +1,3 @@
-
 package src;
 
 import javax.swing.*;
@@ -15,7 +14,6 @@ import javax.swing.DefaultListModel;
 public class TopicsThread extends Thread {
 
     Socket s;
-
     TopicsServerThread server;
 
     public TopicsThread(TopicsServerThread server, Socket s) {

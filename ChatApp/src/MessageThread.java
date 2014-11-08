@@ -30,7 +30,6 @@ public class MessageThread extends Thread {
                     break;
                 }
                 MessageClass message = (MessageClass) in.readObject();
-
                 lm.addElement(message.getMessage());
                 ta.setModel(lm);
             }

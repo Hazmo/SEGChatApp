@@ -35,6 +35,7 @@ public class MessageClass implements Serializable {
      * @param chatRoom
      *        the chat room in which the message was sent
      */
+
     /*
      * public MessageClass(String message, ChatRoomClass chatRoom) { this.message = message;
      * this.chatRoom = chatRoom; date = new Date(); timestamp = new Timestamp(date.getTime());
@@ -45,8 +46,7 @@ public class MessageClass implements Serializable {
         this(null, chatRoom, message, null);
     }
 
-    public MessageClass(String messageType, ChatRoomClass chatRoom, String message,
-            Object[] extraData) {
+    public MessageClass(String messageType, ChatRoomClass chatRoom, String message, Object[] extraData) {
         this.messageType = messageType;
         this.message = message;
         this.chatRoom = chatRoom;

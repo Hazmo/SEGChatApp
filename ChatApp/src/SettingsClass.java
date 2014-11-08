@@ -44,16 +44,11 @@ public class SettingsClass extends JFrame implements ActionListener {
     /**
      * Instantiates a new settings class and initiates all the GUI widgets / components.
      */
-    public SettingsClass(final UserClass user) {
+    public SettingsClass(Socket socket, ObjectInputStream in, ObjectOutputStream out, final UserClass user) {
 
-        try {
-            socket = new Socket("localhost", 4456);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.socket = socket;
+        this.in = in;
+        this.out = out;
 
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         this.user = user;
@@ -99,6 +94,7 @@ public class SettingsClass extends JFrame implements ActionListener {
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
+                /**
                 try {
                     socket.close();
                     in.close();
@@ -107,7 +103,9 @@ public class SettingsClass extends JFrame implements ActionListener {
                 catch (Exception ex) {
                     ex.printStackTrace();
                 }
+                 **/
             }
+
         });
 
         setVisible(true);
@@ -117,14 +115,18 @@ public class SettingsClass extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(final ActionEvent e) {
         if ((e.getActionCommand()).equals("Cancel")) {
+            /*
             try {
+
                 socket.close();
                 in.close();
                 out.close();
+
             }
             catch (IOException e1) {
                 e1.printStackTrace();
             }
+             */
             dispose();
         }
         else {
@@ -135,6 +137,7 @@ public class SettingsClass extends JFrame implements ActionListener {
 
                 try {
                     System.out.println(jFields[0].getText());
+                    out.writeObject(new MessageClass("update_settings", ""));
                     out.writeObject(jFields);
                     out.writeObject(user);
                     confirmation = (int) in.readObject();
@@ -167,6 +170,8 @@ public class SettingsClass extends JFrame implements ActionListener {
                 }
 
                 this.dispose();
+
+                /**
                 try {
                     socket.close();
                     in.close();
@@ -175,7 +180,17 @@ public class SettingsClass extends JFrame implements ActionListener {
                 catch (IOException e1) {
                     e1.printStackTrace();
                 }
+                 **/
             }
         }
+    }
+
+    public void setConnections(Socket socketIn, ObjectOutputStream outIn, ObjectInputStream inIn) {
+        socket = socketIn;
+        in = inIn;
+        out = outIn;
+
+
+
     }
 }

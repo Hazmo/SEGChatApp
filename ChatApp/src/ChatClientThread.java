@@ -1,4 +1,3 @@
-
 package src;
 
 import java.io.IOException;
@@ -54,6 +53,7 @@ public class ChatClientThread extends Thread {
                 System.out.println("I/O failed.");
                 ok = false;
             } catch (ClassNotFoundException e) {
+
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -65,6 +65,7 @@ public class ChatClientThread extends Thread {
                         break;
                     }
                     message = (MessageClass) in.readObject();
+
                     for (ChatClientThread thread : MainChatThread.getClientThreads()) {
                         if (message.getRoomName().equals(thread.getRoomName())) {
                             thread.sendConfirmation(true);

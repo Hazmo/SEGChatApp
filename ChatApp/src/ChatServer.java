@@ -19,7 +19,6 @@ public class ChatServer {
     ServerSocket reportServer;
     static ArrayList<ReportClass> reports = new ArrayList<ReportClass>();
 
-
     public ChatServer() {
     }
 

@@ -4,8 +4,6 @@ import java.awt.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -56,7 +54,6 @@ public class ChatGUI extends JFrame {
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         this.chatRoom = chatRoom;
         this.user = user;
-
 
         setTitle(chatRoom.toString());
         chatWindow.setModel(chatModel);
@@ -149,17 +146,14 @@ public class ChatGUI extends JFrame {
     }
     public void setLayout() {
         JPanel center = new JPanel(new BorderLayout());
-
         JPanel centerWindow = new JPanel(new BorderLayout());
         centerWindow.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         centerWindow.add(jsp, BorderLayout.CENTER);
         center.add(centerWindow, BorderLayout.CENTER);
-
         JPanel eastWindow = new JPanel(new BorderLayout());
         eastWindow.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 20));
         eastWindow.add(jsp2, BorderLayout.CENTER);
         center.add(eastWindow, BorderLayout.EAST);
-
         JPanel jp = new JPanel(new FlowLayout());
 
         jp.add(enterText);
@@ -192,7 +186,6 @@ public class ChatGUI extends JFrame {
             System.exit(1);
         }
     }
-    
 
 
     public void sendMessageListener() {
@@ -202,7 +195,6 @@ public class ChatGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 Calendar calendar = Calendar.getInstance();
-
                 Timestamp currentTimestamp = new Timestamp(calendar.getTime().getTime());
                 String time = new SimpleDateFormat("yy-MM-dd hh:mm").format(currentTimestamp);
 

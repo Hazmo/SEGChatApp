@@ -114,7 +114,7 @@ public class LoginListener implements ActionListener {
 //            catch (Exception e) {
 //                e.printStackTrace();
 //            }
-            new StudentGUI(new UserClass(userLoginData));
+            //new StudentGUI(new UserClass(userLoginData));
         }
         else {
             JOptionPane.showMessageDialog(null, "No such login");

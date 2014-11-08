@@ -87,15 +87,20 @@ public class StudentGUI extends JFrame {
     ArrayList<TopicClass> topicsClasses = new ArrayList<TopicClass>();
 
     UserClass user;
-    Socket s;
+
+    Socket socket;
+
     ObjectOutputStream out;
+
     ObjectInputStream in;
 
     /**
      * Instantiates a new student class.
      */
-    public StudentGUI(final UserClass user) {
-
+    public StudentGUI(Socket socketIn, ObjectInputStream inIn, ObjectOutputStream outIn, final UserClass user) {
+        this.socket = socketIn;
+        this.out = outIn;
+        this.in = inIn;
         this.user = user;
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -103,22 +108,12 @@ public class StudentGUI extends JFrame {
         setLocationRelativeTo(null);
         setLayout();
         setVisible(true);
-
     }
 
     /**
      * Sets the layout for the student GUI.
      */
     public void setLayout() {
-        try {
-            s = new Socket("localhost", 4458);
-            out = new ObjectOutputStream(s.getOutputStream());
-            in = new ObjectInputStream(s.getInputStream());
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(0, 20));
 
@@ -230,11 +225,12 @@ public class StudentGUI extends JFrame {
             out.writeObject(topics);
             out.writeObject(topicsListModel);
             getTopicsFromServer();
-        }
-        catch (IOException e) {
+
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }
+
 
     public void getTopicsFromServer() {
         try {
@@ -243,11 +239,9 @@ public class StudentGUI extends JFrame {
             setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
             setTopicsJListModel((DefaultListModel) in.readObject());
             topicsList.setSelectedIndex(index);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -327,6 +321,7 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
+            System.out.println("socket.isClosed() = " + socket.isClosed());
             if (!searchField.getText().equals("")) {
                 final ArrayList<ChatRoomClass> results = getResults(searchField.getText()
                         .toLowerCase());
@@ -348,7 +343,7 @@ public class StudentGUI extends JFrame {
     /**
      * The listener interface for receiving events in the settings button. Opens up a new frame
      * containing the user settings when the button is pressed.
-     * @see SettingsClass
+     * @see src.SettingsClass
      */
     public class SettingsButtonListener implements ActionListener {
 
@@ -357,7 +352,7 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            this.settingsFrame = new SettingsClass(user);
+            this.settingsFrame = new SettingsClass(socket, in, out, user);
         }
     }
 
@@ -365,29 +360,29 @@ public class StudentGUI extends JFrame {
      * The listener interface for receiving events in the chat rooms table. It gets the table row
      * that is selected, using this to get the chat room object from the topics class and using this
      * to open the chat GUI.
-     * @see TopicClass
-     * @see ChatRoomClass
+     * @see src.TopicClass
+     * @see src.ChatRoomClass
      */
     public class TableMouseListener extends MouseAdapter {
 
         @Override
         public void mouseClicked(final MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+                System.out.println("double click");
                 int rowIndex = roomsTable.getSelectedRow();
-                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 3);
+                String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 4);
                 for (TopicClass topic : topicsClasses) {
                     if (topic.toString().equals(topicString)) {
                         for (ChatRoomClass chatRoom : topic.getChatRooms()) {
                             if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
-                                new ChatGUI(chatRoom, StudentGUI.this.user);
+                                System.out.println("yeahhh");
+                                new ChatGUI(chatRoom, user);
                                 break;
                             }
-
                         }
                         break;
                     }
                 }
-
             } else if (SwingUtilities.isRightMouseButton( e )) {
                 int rowNumber = roomsTable.rowAtPoint(e.getPoint());
                 ListSelectionModel chatLSModel = roomsTable.getSelectionModel();
@@ -505,6 +500,7 @@ public class StudentGUI extends JFrame {
     }
 
     public class RefreshButtonListener implements ActionListener {
+
         StudentGUI ui;
 
         public RefreshButtonListener(StudentGUI ui) {
@@ -514,7 +510,6 @@ public class StudentGUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             ui.getTopicsFromServer();
-
         }
     }
 }

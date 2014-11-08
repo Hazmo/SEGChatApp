@@ -28,8 +28,7 @@ public class MainChatThread extends Thread {
                 ccl.start();
                 count++;
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             System.out.println("MainChatThread");
         }
