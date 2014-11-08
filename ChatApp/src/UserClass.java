@@ -1,5 +1,5 @@
-
 package src;
+
 import java.io.Serializable;
 
 public class UserClass implements Serializable {

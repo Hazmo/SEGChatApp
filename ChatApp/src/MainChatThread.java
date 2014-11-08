@@ -1,4 +1,3 @@
-
 package src;
 
 import java.io.IOException;
@@ -12,7 +11,6 @@ public class MainChatThread extends Thread {
 
     ServerSocket server;
     static ArrayList<ChatClientThread> clientWorkers = new ArrayList<ChatClientThread>();
-    static int count = 0;
 
     public MainChatThread(ServerSocket server) {
         this.server = server;
@@ -23,15 +21,12 @@ public class MainChatThread extends Thread {
         ChatClientThread ccl;
         try {
             while (true) {
-                ccl = new ChatClientThread(server.accept(), count);
+                ccl = new ChatClientThread(server.accept());
                 clientWorkers.add(ccl);
                 ccl.start();
-                count++;
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("MainChatThread");
         }
 
     }

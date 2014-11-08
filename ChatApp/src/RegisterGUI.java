@@ -1,4 +1,3 @@
-
 package src;
 
 /**
@@ -145,7 +144,8 @@ class RegisterGUI extends JFrame implements ActionListener {
 
                 int confirmation = 0;
                 try {
-                    out.writeObject(new MessageClass("register", "", jFields));
+                    out.writeObject(new MessageClass("register", "",jFields));
+                    //out.writeObject(jFields);
                     confirmation = (int) in.readObject();
                 }
 
@@ -155,39 +155,36 @@ class RegisterGUI extends JFrame implements ActionListener {
                 }
 
                 switch (confirmation) {
-                    case (1): {
-                        JOptionPane
-                                .showMessageDialog(this,
-                                        "Congratulations with successful registration! To log in use your password and student ID.");
-                        this.dispose();
-                        break;
-                    }
-
-                    case (2): {
-                        JOptionPane.showMessageDialog(this,
-                                "Registration failed! Problem with the user database!");
-                        this.dispose();
-                        break;
-                    }
-
-                    case (3): {
-                        JOptionPane.showMessageDialog(this,
-                                "Registration failed, problem with connection to server!");
-                        this.dispose();
-                        break;
-                    }
-                    case (4): {
-                        JOptionPane.showMessageDialog(this,
-                                "Registration failed, this ID has already been registered!");
-
-                        this.dispose();
-
-                        break;
-
-                    }
+                case (1): {
+                    JOptionPane
+                            .showMessageDialog(this,
+                                    "Congratulations with successful registration! To log in use your password and student ID.");
+                    this.dispose();
+                    break;
                 }
 
+                case (2): {
+                    JOptionPane.showMessageDialog(this,
+                            "Registration failed! Problem with the user database!");
+                    this.dispose();
+                    break;
+                }
 
+                case (3): {
+                    JOptionPane.showMessageDialog(this,
+                            "Registration failed, problem with connection to server!");
+                    this.dispose();
+                    break;
+                }
+                case (4): {
+                    JOptionPane.showMessageDialog(this,
+                            "Registration failed, this ID has already been registered!");
+
+                    this.dispose();
+
+                    break;
+                }
+                }
 
                 try {
                     socket.close();

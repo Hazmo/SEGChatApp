@@ -1,5 +1,5 @@
-
 package src;
+
 import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -21,11 +21,13 @@ public class TopicsServerThread extends Thread {
 
     TopicsServerThread(ServerSocket server) {
         this.server = server;
+
+
         setUpInitialTopics();
     }
 
     private void setUpInitialTopics() {
-        for (String topicName : initialTopics) {
+        for(String topicName : initialTopics) {
             topics.add(new TopicClass(topicName));
             topicsModel.addElement(topicName);
         }
@@ -41,7 +43,6 @@ public class TopicsServerThread extends Thread {
             }
         }
     }
-
 
     public synchronized ArrayList<TopicClass> getTopics() {
         return topics;

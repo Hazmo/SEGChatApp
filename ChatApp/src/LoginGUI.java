@@ -5,10 +5,12 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 import javax.swing.BorderFactory;
@@ -84,7 +86,6 @@ public class LoginGUI extends JFrame {
                 try (Socket login = new Socket("localhost", 4455);
                         ObjectOutputStream out = new ObjectOutputStream(login.getOutputStream());
                         ObjectInputStream in = new ObjectInputStream(login.getInputStream());) {
-
                     String idFieldText = studentIDField.getText();
                     String passFieldText = new String(passField.getPassword());
 
@@ -101,6 +102,7 @@ public class LoginGUI extends JFrame {
 
                     if (loginConfirm.getMessage().equals("true")) {
                         UserClass user = (UserClass) in.readObject();
+
                         new StudentGUI(user);
                         dispose();
                     }

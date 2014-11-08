@@ -1,4 +1,3 @@
-
 package src;
 
 import javax.swing.*;
@@ -8,14 +7,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import javax.swing.DefaultListModel;
 /**
  * Created by Harry on 04/11/2014.
  */
 public class TopicsThread extends Thread {
 
     Socket s;
-
     TopicsServerThread server;
 
     public TopicsThread(TopicsServerThread server, Socket s) {

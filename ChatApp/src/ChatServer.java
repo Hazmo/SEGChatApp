@@ -1,10 +1,7 @@
-
 package src;
-
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
 
 public class ChatServer {
 
@@ -15,10 +12,6 @@ public class ChatServer {
     ServerSocket forgottenServer;
     ServerSocket topicsServer;
     ServerSocket registerLoginServer;
-
-    ServerSocket reportServer;
-    static ArrayList<ReportClass> reports = new ArrayList<ReportClass>();
-
 
     public ChatServer() {
     }
@@ -36,8 +29,6 @@ public class ChatServer {
             forgottenServer = new ServerSocket(4457);
             ok = 4458;
             topicsServer = new ServerSocket(4458);
-            ok = 4459;
-            reportServer = new ServerSocket(4459);
 
             //registerServer = new ServerSocket(4459);
 
@@ -63,9 +54,6 @@ public class ChatServer {
 
         TopicsServerThread tt = new TopicsServerThread(topicsServer);
         tt.start();
-        
-        ReportThread repSer = new ReportThread(reportServer, reports);
-        repSer.start();
 
         MainChatThread mct = new MainChatThread(server);
         mct.start();

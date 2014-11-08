@@ -1,24 +1,17 @@
-
 package src;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
+import javax.swing.*;
+import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
-
-import javax.swing.JTextField;
 
 /**
  * Created by Harry on 05/11/2014.
  */
-public class RegisterLoginThread extends Thread {
+public class RegisterLoginThread extends Thread{
+
     Socket s;
 
     String[][] userDataLogIn;
@@ -26,6 +19,7 @@ public class RegisterLoginThread extends Thread {
     String password;
     File users;
     UserClass user;
+
 
     JTextField[] jFields = new JTextField[6];
     String[][] userDataRegister;
@@ -36,8 +30,8 @@ public class RegisterLoginThread extends Thread {
     }
 
     public void run() {
-
-        try (ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+        try (
+                ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
                 ObjectInputStream in = new ObjectInputStream(s.getInputStream());) {
 
             while (true) {
@@ -48,17 +42,15 @@ public class RegisterLoginThread extends Thread {
 
                     studentID = message.getMessage();
                     password = (String) message.getExtraData()[0];
-                    // System.out.println("studentID = " + studentID);
-                    // System.out.println("password = " + password);
+                    System.out.println("studentID = " + studentID);
+                    System.out.println("password = " + password);
 
                     boolean loggedIn = loginUser(studentID, password);
-                    // System.out
-                    // .println("Boolean.toString(loggedIn) = " + Boolean.toString(loggedIn));
+                    System.out.println("Boolean.toString(loggedIn) = " + Boolean.toString(loggedIn));
                     out.writeObject(new MessageClass("logged_in", Boolean.toString(loggedIn)));
                     if (loggedIn) {
                         out.writeObject(user);
                     }
-
 
 
                 } else if (message.getMessageType().equals("register")) {
@@ -96,10 +88,10 @@ public class RegisterLoginThread extends Thread {
         } catch (IOException e) {
             e.getMessage();
         } catch (ClassNotFoundException e) {
-
             e.getMessage();
         }
     }
+
 
     public boolean loginUser(String studentID, String password) {
         getUserDataLogIn();
@@ -130,6 +122,7 @@ public class RegisterLoginThread extends Thread {
         }
         return new String[6];
     }
+
 
     public void getUserDataLogIn() {
         users = new File("users.csv");

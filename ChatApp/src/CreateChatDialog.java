@@ -1,6 +1,5 @@
 package src;
 
-
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
@@ -106,8 +105,8 @@ public class CreateChatDialog extends JFrame {
      * The listener used to detect events in the OK button. When the button is pressed, the data
      * entered in the fields is used to create a new chat room class, which, in turn, is added to
      * its respective topic.
-     * @see TopicClass
-     * @see ChatRoomClass
+     * @see src.TopicClass
+     * @see src.ChatRoomClass
      */
     public class OkButtonListener implements ActionListener {
 
@@ -143,8 +142,7 @@ public class CreateChatDialog extends JFrame {
                 if (topic.toString().equals(topicName)) {
                     topic.addChatRoom(chatRoom);
                     topic.addRow(chatRoom);
-                    studentFrame.sendTopicsToServer(studentFrame.topicsClasses,
-                            studentFrame.listModel);
+                    studentFrame.sendTopicsToServer(studentFrame.topicsClasses, studentFrame.listModel);
                 }
             }
 
