@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /**
  * Created by Harry on 05/11/2014.
  */
-public class RegisterLoginServerThread extends Thread{
+public class MainServerThread extends Thread{
 
     ServerSocket server;
 
@@ -19,7 +19,7 @@ public class RegisterLoginServerThread extends Thread{
     ArrayList<TopicClass> topics = new ArrayList<TopicClass>();
     DefaultListModel topicsModel = new DefaultListModel();
 
-    public RegisterLoginServerThread (ServerSocket server) {
+    public MainServerThread(ServerSocket server) {
         this.server = server;
         setUpInitialTopics();
     }
@@ -27,7 +27,7 @@ public class RegisterLoginServerThread extends Thread{
     public void run() {
         while(true) {
             try {
-                RegisterLoginThread rlg = new RegisterLoginThread(this,server.accept());
+                MainServerSocketThread rlg = new MainServerSocketThread(this,server.accept());
                 rlg.start();
             } catch (IOException e) {
                 e.printStackTrace();

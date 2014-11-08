@@ -2,18 +2,16 @@ package src;
 
 import javax.swing.*;
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Created by Harry on 05/11/2014.
  */
-public class RegisterLoginThread extends Thread{
+public class MainServerSocketThread extends Thread{
 
     Socket s;
-    RegisterLoginServerThread server;
+    MainServerThread server;
 
 
     //RegisterLogin Variables
@@ -25,7 +23,7 @@ public class RegisterLoginThread extends Thread{
     static boolean ok = false;
     UserData userData = new UserData("users.csv");
 
-    public RegisterLoginThread(RegisterLoginServerThread server, Socket s) {
+    public MainServerSocketThread(MainServerThread server, Socket s) {
         this.server = server;
         this.s = s;
     }

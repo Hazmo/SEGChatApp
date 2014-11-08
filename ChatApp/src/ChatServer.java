@@ -48,7 +48,7 @@ public class ChatServer {
         //LoginThread lt = new LoginThread(loginServer);
         //lt.start();
 
-        RegisterLoginServerThread tlst = new RegisterLoginServerThread(registerLoginServer);
+        MainServerThread tlst = new MainServerThread(registerLoginServer);
         tlst.start();
 
         RegisterThread rt = new RegisterThread(registerServer);
