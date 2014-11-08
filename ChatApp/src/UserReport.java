@@ -38,13 +38,22 @@ class UserReport extends JFrame implements ActionListener{
     String userName;
     String reportObject;
 
+    Socket socket;
+    ObjectOutputStream out;
+    ObjectInputStream in;
+
     UserReport() {
         addLayout();
         reportTitle = ((JTextField)answer).getText().toString();
     }
-    UserReport(String reportObject, String reportObjectValue, String userName) {
+    UserReport(String reportObject, String reportObjectValue, String userName, Socket socket, ObjectOutputStream out, ObjectInputStream in) {
         this.reportObject = reportObject;
         this.userName = userName;
+
+        this.socket = socket;
+        this.out = out;
+        this.in = in;
+
         questionString = "You are reporting about the following "+ reportObject;
         answer = new JLabel(reportObjectValue);
         answer.setForeground(Color.blue);
@@ -103,21 +112,21 @@ class UserReport extends JFrame implements ActionListener{
         }
     }
     private void submitReport() {
-    	//String userName = user.getName();
-    	String reportMessage = detailsTextArea.getText().toString();
-    	
-    	ReportClass report = new ReportClass(userName, reportTitle, reportMessage, reportObject);
-    	
-    	try(Socket reportSocket = new Socket("localhost", 4459);
-            ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
-    		BufferedReader in = new BufferedReader(new InputStreamReader(reportSocket.getInputStream()));
-    	){
-    		out.writeObject(new String("ADD"));
-    		out.writeObject(report);
-    		JOptionPane.showMessageDialog(null, in.readLine());
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
+        //String userName = user.getName();
+        String reportMessage = detailsTextArea.getText().toString();
+
+        ReportClass report = new ReportClass(userName, reportTitle, reportMessage, reportObject);
+
+        try{
+            //out.writeObject(new String("ADD"));
+            out.writeObject(new MessageClass("add_reports", ""));
+            out.writeObject(report);
+            String messageDialogString = (String) in.readObject();
+            JOptionPane.showMessageDialog(null, messageDialogString);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

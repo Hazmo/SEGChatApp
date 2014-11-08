@@ -2,6 +2,7 @@ package src;
 
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import javax.swing.*;
 import java.util.ArrayList;
@@ -16,8 +17,11 @@ public class MainServerThread extends Thread{
 
 
     String initialTopics[] = {"Informatics", "Mathematics"};
-    ArrayList<TopicClass> topics = new ArrayList<TopicClass>();
+    ArrayList<TopicClass> topics = new ArrayList<>();
     DefaultListModel topicsModel = new DefaultListModel();
+    ArrayList<ChatRoomClass> chatRooms = new ArrayList<>();
+
+    ArrayList<ReportClass> reports = new ArrayList<>();
 
     public MainServerThread(ServerSocket server) {
         this.server = server;
@@ -42,17 +46,34 @@ public class MainServerThread extends Thread{
         }
     }
 
-
+    //topic stuff
     public synchronized ArrayList<TopicClass> getTopics() {
         return topics;
     }
     public synchronized DefaultListModel getTopicsModel() {
         return topicsModel;
     }
+    public synchronized ArrayList<ChatRoomClass> getChatRoomsList(){
+        return chatRooms;
+    };
     public synchronized void setTopics(ArrayList<TopicClass> topicsSent) {
         topics = topicsSent;
     }
     public synchronized void setTopicsModel(DefaultListModel topicsModelSent) {
         topicsModel = topicsModelSent;
+    }
+    public synchronized void setChatRoomsList(ArrayList<ChatRoomClass> chatRoomsListSent) {
+        chatRooms = chatRoomsListSent;
+    }
+
+    //report stuff
+    public synchronized ArrayList<ReportClass> getReports() {
+        return reports;
+    }
+    public synchronized void setReports(ArrayList<ReportClass> reportsSent) {
+        reports = reportsSent;
+    }
+    public synchronized void addReport(ReportClass report) {
+        reports.add(report);
     }
 }

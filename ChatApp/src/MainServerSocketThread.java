@@ -35,17 +35,19 @@ public class MainServerSocketThread extends Thread{
 
             while (true) {
 
+
+
                 MessageClass message = (MessageClass) in.readObject();
 
                 if (message.getMessageType().equals("get_topics")) {
-                    System.out.println("inside");
                     out.writeObject(server.getTopics());
                     out.writeObject(server.getTopicsModel());
+                    out.writeObject(server.getChatRoomsList());
 
                 } else if (message.getMessageType().equals("send_topics")) {
-                    System.out.println("inside send");
                     server.setTopics((ArrayList<TopicClass>) in.readObject());
                     server.setTopicsModel((DefaultListModel) in.readObject());
+                    server.setChatRoomsList((ArrayList<ChatRoomClass>) in.readObject());
 
                 } else if (message.getMessageType().equals("log_in")) {
                     studentID = message.getMessage();
@@ -120,6 +122,16 @@ public class MainServerSocketThread extends Thread{
                         boolean confirm = false;
                         out.writeObject(confirm);
                     }
+
+                } else if(message.getMessageType().equals("add_reports")) {
+                    server.addReport((ReportClass) in.readObject());
+                    out.writeObject(new String("Report has been logged."));
+
+                } else if(message.getMessageType().equals("get_reports")) {
+                        out.writeObject(server.getReports());
+
+                } else if(message.getMessageType().equals("resolve_report")) {
+                    server.setReports((ArrayList<ReportClass>) in.readObject());
                 }
             }
         } catch (IOException e) {

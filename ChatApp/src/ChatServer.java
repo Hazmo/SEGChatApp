@@ -14,7 +14,7 @@ public class ChatServer {
     ServerSocket settingsServer;
     ServerSocket forgottenServer;
     ServerSocket topicsServer;
-    ServerSocket registerLoginServer;
+    ServerSocket mainServerSocket;
 
     ServerSocket reportServer;
     static ArrayList<ReportClass> reports = new ArrayList<ReportClass>();
@@ -28,7 +28,7 @@ public class ChatServer {
             ok = 4454;
             server = new ServerSocket(4454);
             ok = 4455;
-            registerLoginServer = new ServerSocket(4455);
+            mainServerSocket = new ServerSocket(4455);
             ok = 4456;
             settingsServer = new ServerSocket(4456);
             ok = 4457;
@@ -48,7 +48,7 @@ public class ChatServer {
         //LoginThread lt = new LoginThread(loginServer);
         //lt.start();
 
-        MainServerThread tlst = new MainServerThread(registerLoginServer);
+        MainServerThread tlst = new MainServerThread(mainServerSocket);
         tlst.start();
 
         RegisterThread rt = new RegisterThread(registerServer);

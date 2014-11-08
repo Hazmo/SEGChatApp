@@ -29,8 +29,16 @@ public class ModeratorReports extends JFrame {
 	private JButton resolveIssue = new JButton("Resolve Issue");
 	private JButton backButton = new JButton("Back");
 	private ArrayList<ReportClass> reports;
-	
-	ModeratorReports() {
+
+
+	Socket socket;
+    ObjectOutputStream out;
+    ObjectInputStream in;
+
+	ModeratorReports(Socket socket, ObjectOutputStream out, ObjectInputStream in) {
+        this.socket = socket;
+        this.out = out;
+        this.in = in;
 		initGUI();
 	}
 	
@@ -54,21 +62,18 @@ public class ModeratorReports extends JFrame {
 		centrePanel.add(rplPane, BorderLayout.CENTER);
 		centrePanel.add(textPane, BorderLayout.SOUTH);
 		add(centrePanel, BorderLayout.CENTER);
-		
-		try(Socket reportSocket = new Socket("localhost", 4459);
-				ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
-		    	ObjectInputStream in = new ObjectInputStream(reportSocket.getInputStream());
-			) {
-				out.writeObject(new String("READ"));
-				reports = (ArrayList<ReportClass>) in.readObject();
-			} catch (Exception e) {
-	            if (e.getClass().equals(IOException.class)) {
-	                System.out.println("Accept failed: 4457");
-	                System.exit(-1);
-	            }
-	            else if (e.getClass().equals(ClassNotFoundException.class))
-	                e.printStackTrace();
-	        }
+
+        try{    //out.writeObject(new String("READ"));
+            out.writeObject(new MessageClass("get_reports", ""));
+            reports = (ArrayList<ReportClass>) in.readObject();
+        } catch (Exception e) {
+            if (e.getClass().equals(IOException.class)) {
+                System.out.println("Accept failed: 4457");
+                System.exit(-1);
+            }
+            else if (e.getClass().equals(ClassNotFoundException.class))
+                e.printStackTrace();
+        }
 		
 		setReports();
 		
@@ -119,22 +124,20 @@ public class ModeratorReports extends JFrame {
 		
 		reportsList.setModel(reportList);
 	}
-	
-	void setResolved() {
-		try(Socket reportSocket = new Socket("localhost", 4459);
-				ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
-		    	ObjectInputStream in = new ObjectInputStream(reportSocket.getInputStream());
-			) {
-				out.writeObject(new String("RESOLVE"));
-				out.writeObject(reports);
-			} catch (Exception e) {
-	            if (e.getClass().equals(IOException.class)) {
-	                System.out.println("Accept failed: 4457");
-	                System.exit(-1);
-	            }
-	            else if (e.getClass().equals(ClassNotFoundException.class))
-	                e.printStackTrace();
-	        }
-	}
-	
+
+    void setResolved() {
+        try {
+            //out.writeObject(new String("RESOLVE"));
+            out.writeObject(new MessageClass("resolve_report", ""));
+            out.writeObject(reports);
+        } catch (Exception e) {
+            if (e.getClass().equals(IOException.class)) {
+                System.out.println("Accept failed: 4457");
+                System.exit(-1);
+            }
+            else if (e.getClass().equals(ClassNotFoundException.class))
+                e.printStackTrace();
+        }
+    }
+
 }

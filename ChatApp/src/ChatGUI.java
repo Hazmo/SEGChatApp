@@ -93,7 +93,7 @@ public class ChatGUI extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             String messageTitle =chatWindow.getSelectedValue().toString();
-                            new UserReport("message", messageTitle, user.getName());
+                            new UserReport("message", messageTitle, user.getName(), socket, out, in);
                         }
                     });
                 }

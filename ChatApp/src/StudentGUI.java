@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -186,7 +187,7 @@ public class StudentGUI extends JFrame {
         	reportsButton.addActionListener(new ActionListener() {
         		@Override
         		public void actionPerformed(ActionEvent e) {
-        			new ModeratorReports();
+        			new ModeratorReports(socket, out, in);
         		}
         	});
         	southPanel.add(reportsButton);
@@ -219,11 +220,16 @@ public class StudentGUI extends JFrame {
         topicsList.setModel(topicsModel);
     }
 
+    public void setChatRoomsList(ArrayList<ChatRoomClass> chatRooms) {
+        this.chatRooms = chatRooms;
+    }
+
     public void sendTopicsToServer(ArrayList<TopicClass> topics, DefaultListModel topicsListModel) {
         try {
             out.writeObject(new MessageClass("send_topics", "whatever"));
             out.writeObject(topics);
             out.writeObject(topicsListModel);
+            out.writeObject(chatRooms);
             getTopicsFromServer();
 
         } catch(IOException e) {
@@ -238,6 +244,7 @@ public class StudentGUI extends JFrame {
             out.writeObject(new MessageClass("get_topics", "whatever"));
             setTopicsArrayList((ArrayList<TopicClass>) in.readObject());
             setTopicsJListModel((DefaultListModel) in.readObject());
+            setChatRoomsList((ArrayList<ChatRoomClass>) in.readObject());
             topicsList.setSelectedIndex(index);
         } catch (IOException e) {
             e.printStackTrace();
@@ -411,7 +418,7 @@ public class StudentGUI extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
 
-                        new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString(), user.getName());
+                        new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString(), user.getName(), socket, out, in);
                     }
                 });
                 upvoteItem = new JMenuItem("Upvote");
