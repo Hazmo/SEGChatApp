@@ -204,6 +204,7 @@ class RegisterGUI extends JFrame implements ActionListener {
                 socket.close();
                 in.close();
                 out.close();
+                this.dispose();
             }
             catch (IOException e1) {
                 e1.printStackTrace();
