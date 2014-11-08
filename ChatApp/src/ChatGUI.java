@@ -50,7 +50,7 @@ public class ChatGUI extends JFrame {
     UserClass user;
     String color;
 
-    public ChatGUI(final ChatRoomClass chatRoom, UserClass user) {
+    public ChatGUI(final ChatRoomClass chatRoom, final UserClass user) {
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         this.chatRoom = chatRoom;
         this.user = user;
@@ -93,7 +93,7 @@ public class ChatGUI extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             String messageTitle =chatWindow.getSelectedValue().toString();
-                            new UserReport("message", messageTitle);
+                            new UserReport("message", messageTitle, user.getName());
                         }
                     });
                 }

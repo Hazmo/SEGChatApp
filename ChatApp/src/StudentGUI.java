@@ -411,7 +411,7 @@ public class StudentGUI extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
 
-                        new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString());
+                        new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString(), user.getName());
                     }
                 });
                 upvoteItem = new JMenuItem("Upvote");

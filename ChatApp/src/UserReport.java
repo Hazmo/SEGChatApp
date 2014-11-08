@@ -1,3 +1,4 @@
+
 package src;
 
 import java.awt.*;
@@ -34,12 +35,16 @@ class UserReport extends JFrame implements ActionListener{
     String title;
     UserClass user;
     String reportTitle;
+    String userName;
+    String reportObject;
 
     UserReport() {
         addLayout();
         reportTitle = ((JTextField)answer).getText().toString();
     }
-    UserReport(String reportObject, String reportObjectValue) {
+    UserReport(String reportObject, String reportObjectValue, String userName) {
+        this.reportObject = reportObject;
+        this.userName = userName;
         questionString = "You are reporting about the following "+ reportObject;
         answer = new JLabel(reportObjectValue);
         answer.setForeground(Color.blue);
@@ -56,10 +61,10 @@ class UserReport extends JFrame implements ActionListener{
         JPanel south = new JPanel(new FlowLayout());
 
 
+
         JLabel question = new JLabel(questionString);
         JLabel detailsLabel = new JLabel("Why do you want to report about this?");
         detailsTextArea = new JTextArea(10, 30);
-
         JButton submitButton = new JButton("SUBMIT");
         JButton cancelButton = new JButton("CANCEL");
         submitButton.addActionListener(this);
@@ -98,10 +103,10 @@ class UserReport extends JFrame implements ActionListener{
         }
     }
     private void submitReport() {
-    	String userName = user.getName();
+    	//String userName = user.getName();
     	String reportMessage = detailsTextArea.getText().toString();
     	
-    	ReportClass report = new ReportClass(userName, reportTitle, reportMessage, title);
+    	ReportClass report = new ReportClass(userName, reportTitle, reportMessage, reportObject);
     	
     	try(Socket reportSocket = new Socket("localhost", 4459);
             ObjectOutputStream out = new ObjectOutputStream(reportSocket.getOutputStream());
@@ -115,3 +120,4 @@ class UserReport extends JFrame implements ActionListener{
     	}
     }
 }
+
