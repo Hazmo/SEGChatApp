@@ -383,7 +383,7 @@ public class StudentGUI extends JFrame {
                         for (ChatRoomClass chatRoom : topic.getChatRooms()) {
                             if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
                                 System.out.println("yeahhh");
-                                new ChatGUI(chatRoom, user);
+                                new ChatGUI(chatRoom, user, socket, out, in);
                                 break;
                             }
                         }
@@ -426,18 +426,19 @@ public class StudentGUI extends JFrame {
                         }
                     });
                 }
-
-                deleteRoom = new JMenuItem("Delete");
-                add(deleteRoom);
-                deleteRoom.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        tblMod.removeRow(row);
-                        roomsTable.setModel(tblMod);
-                        sendTopicsToServer(topicsClasses, listModel);
-                        getTopicsFromServer();
-                    }
-                });
+                if(user.isAdmin()) {
+                    deleteRoom = new JMenuItem("Delete");
+                    add(deleteRoom);
+                    deleteRoom.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            tblMod.removeRow(row);
+                            roomsTable.setModel(tblMod);
+                            sendTopicsToServer(topicsClasses, listModel);
+                            getTopicsFromServer();
+                        }
+                    });
+                }
 
                 upvoteItem = new JMenuItem("Upvote");
                 add(upvoteItem);

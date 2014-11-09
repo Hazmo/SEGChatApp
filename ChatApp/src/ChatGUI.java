@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -31,6 +32,10 @@ import javax.swing.SwingUtilities;
 
 public class ChatGUI extends JFrame {
 
+    Socket chatSocket;
+    ObjectOutputStream chatOut;
+    ObjectInputStream chatIn;
+
     Socket socket;
     ObjectOutputStream out;
     ObjectInputStream in;
@@ -50,10 +55,16 @@ public class ChatGUI extends JFrame {
     UserClass user;
     String color;
 
-    public ChatGUI(final ChatRoomClass chatRoom, final UserClass user) {
+    public ChatGUI(final ChatRoomClass chatRoom, final UserClass user, final Socket socket, final ObjectOutputStream out, final ObjectInputStream in) {
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         this.chatRoom = chatRoom;
         this.user = user;
+
+        this.socket = socket;
+        this.out = out;
+        this.in = in;
+
+        setChatModel();
 
         setTitle(chatRoom.toString());
         chatWindow.setModel(chatModel);
@@ -111,10 +122,10 @@ public class ChatGUI extends JFrame {
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 try {
-                    out.writeObject(false);
-                    in.close();
-                    out.close();
-                    socket.close();
+                    chatOut.writeObject(false);
+                    chatIn.close();
+                    chatOut.close();
+                    chatSocket.close();
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
@@ -144,6 +155,28 @@ public class ChatGUI extends JFrame {
             case 12: color = "Yellow"; break;
         }
     }
+
+    public void setChatModel() {
+        try {
+            out.writeObject(new MessageClass("get_chat_model", "", new Object[]{chatRoom}));
+            chatModel = (DefaultListModel) in.readObject();
+        } catch(IOException e) {
+            e.getMessage();
+        } catch (ClassNotFoundException e) {
+            e.getMessage();
+        }
+
+    }
+
+    public void sendChatModel() {
+        try {
+            out.writeObject(new MessageClass("send_chat_model", "", new Object[]{chatModel}));
+        } catch (IOException e) {
+            e.getMessage();
+        }
+    }
+
+
     public void setLayout() {
         JPanel center = new JPanel(new BorderLayout());
         JPanel centerWindow = new JPanel(new BorderLayout());
@@ -166,15 +199,15 @@ public class ChatGUI extends JFrame {
 
     public void listenSocket() {
         try {
-            socket = new Socket("localhost", 4454);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
+            chatSocket = new Socket("localhost", 4454);
+            chatOut = new ObjectOutputStream(chatSocket.getOutputStream());
+            chatIn = new ObjectInputStream(chatSocket.getInputStream());
 
             // Send the initial connection message to the server giving the information about this
             // particular chatroom
             // specifically it's name
             MessageClass initialMessage = new MessageClass(null, chatRoom);
-            out.writeObject(initialMessage);
+            chatOut.writeObject(initialMessage);
 
         }
         catch (UnknownHostException e) {
@@ -206,8 +239,9 @@ public class ChatGUI extends JFrame {
 
                 try {
 
-                    out.writeObject(true);
-                    out.writeObject(message);
+                    chatOut.writeObject(true);
+                    chatOut.writeObject(message);
+                    chatRoom.addMessageToHistory(message.getMessage());
                 }
                 catch (IOException e1) {
                     e1.printStackTrace();

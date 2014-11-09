@@ -1,5 +1,6 @@
 package src;
 
+import javax.swing.*;
 import java.io.Serializable;
 
 /**
@@ -20,6 +21,8 @@ public class ChatRoomClass implements Serializable {
 
     int votes;
 
+    DefaultListModel chatModel;
+
     /**
      * Instantiates a new chat room class.
      * @param name
@@ -33,6 +36,7 @@ public class ChatRoomClass implements Serializable {
         this.description = description;
         connections = 0;
         votes = 0;
+        chatModel = new DefaultListModel();
     }
 
     /**
@@ -56,6 +60,14 @@ public class ChatRoomClass implements Serializable {
         return votes;
     }
 
+    public void addMessageToHistory(String message) {
+        chatModel.addElement(message);
+    }
+
+    public DefaultListModel getChatModel() {
+        return chatModel;
+    }
+
     /**
      * Converts and returns the chat room information as an array of strings.
      * @return the chat room information as an array of strings
@@ -64,5 +76,10 @@ public class ChatRoomClass implements Serializable {
         String[] chatRoomInfo = { name, "" + connections, description, "" + votes, topicName };
 
         return chatRoomInfo;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }

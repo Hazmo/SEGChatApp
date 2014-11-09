@@ -36,7 +36,6 @@ public class MainServerSocketThread extends Thread{
             while (true) {
 
 
-
                 MessageClass message = (MessageClass) in.readObject();
 
                 if (message.getMessageType().equals("get_topics")) {
@@ -116,24 +115,28 @@ public class MainServerSocketThread extends Thread{
                         boolean confirm = true;
                         out.writeObject(confirm);
                         out.writeObject(userData.getForgottenPassword());
-                    }
-
-                    else {
+                    } else {
                         boolean confirm = false;
                         out.writeObject(confirm);
                     }
 
-                } else if(message.getMessageType().equals("add_reports")) {
+                } else if (message.getMessageType().equals("add_reports")) {
                     server.addReport((ReportClass) in.readObject());
                     out.writeObject(new String("Report has been logged."));
 
-                } else if(message.getMessageType().equals("get_reports")) {
-                        out.writeObject(server.getReports());
+                } else if (message.getMessageType().equals("get_reports")) {
+                    out.writeObject(server.getReports());
 
-                } else if(message.getMessageType().equals("resolve_report")) {
+                } else if (message.getMessageType().equals("resolve_report")) {
                     server.setReports((ArrayList<ReportClass>) in.readObject());
+
+                } else if (message.getMessageType().equals("get_chat_model")) {
+                    ChatRoomClass chatRoom = (ChatRoomClass) message.getExtraData()[0];
+                    chatRoom = server.findChatRoomClass(chatRoom);
+                    out.writeObject(chatRoom.getChatModel());
                 }
             }
+
         } catch (IOException e) {
             e.getMessage();
         } catch (ClassNotFoundException e) {

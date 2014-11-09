@@ -76,4 +76,16 @@ public class MainServerThread extends Thread{
     public synchronized void addReport(ReportClass report) {
         reports.add(report);
     }
-}
+
+
+    public synchronized ChatRoomClass findChatRoomClass(ChatRoomClass chatRoomClass) {
+        for (ChatRoomClass chatRoom : chatRooms) {
+            System.out.println(chatRoom.equals(chatRoomClass));
+            if(chatRoom.equals(chatRoomClass)) {
+                System.out.println("we find it");
+                return chatRoom;
+            }
+        }
+        return null;
+    }
+ }
