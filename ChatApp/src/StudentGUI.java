@@ -408,8 +408,12 @@ public class StudentGUI extends JFrame {
          */
         class RightClickMenu extends JPopupMenu implements ActionListener {
             JMenuItem reportItem;
+            JMenuItem deleteRoom;
             JMenuItem upvoteItem;
             JMenuItem downVoteItem;
+
+            int row = roomsTable.getSelectedRow();
+            DefaultTableModel tblMod = (DefaultTableModel) roomsTable.getModel();
 
             public RightClickMenu(final ListSelectionModel chatLSModel) {
                 if (!user.isAdmin()) {
@@ -422,7 +426,19 @@ public class StudentGUI extends JFrame {
                         }
                     });
                 }
-                
+
+                deleteRoom = new JMenuItem("Delete");
+                add(deleteRoom);
+                deleteRoom.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        tblMod.removeRow(row);
+                        roomsTable.setModel(tblMod);
+                        sendTopicsToServer(topicsClasses, listModel);
+                        getTopicsFromServer();
+                    }
+                });
+
                 upvoteItem = new JMenuItem("Upvote");
                 add(upvoteItem);
                 upvoteItem.addActionListener(this);
