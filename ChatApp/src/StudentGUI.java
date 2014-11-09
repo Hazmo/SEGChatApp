@@ -7,6 +7,7 @@ package src;
 //import sun.plugin2.message.Message;
 
 import java.awt.BorderLayout;
+
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -47,7 +48,7 @@ public class StudentGUI extends JFrame {
 
     /** The user settings button. */
     JButton settingsButton = new JButton("Settings");
-    
+
     /** The moderator reports button. */
     JButton reportsButton = new JButton("Mod Reports");
 
@@ -98,7 +99,8 @@ public class StudentGUI extends JFrame {
     /**
      * Instantiates a new student class.
      */
-    public StudentGUI(Socket socketIn, ObjectInputStream inIn, ObjectOutputStream outIn, final UserClass user) {
+    public StudentGUI(Socket socketIn, ObjectInputStream inIn, ObjectOutputStream outIn,
+            final UserClass user) {
         this.socket = socketIn;
         this.out = outIn;
         this.in = inIn;
@@ -183,14 +185,14 @@ public class StudentGUI extends JFrame {
         final JPanel southPanel = new JPanel(new FlowLayout());
         createButton.addActionListener(new CreateButtonListener(this));
 
-        if(user.isAdmin()) {
-        	reportsButton.addActionListener(new ActionListener() {
-        		@Override
-        		public void actionPerformed(ActionEvent e) {
-        			new ModeratorReports(socket, out, in);
-        		}
-        	});
-        	southPanel.add(reportsButton);
+        if (user.isAdmin()) {
+            reportsButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new ModeratorReports(socket, out, in);
+                }
+            });
+            southPanel.add(reportsButton);
         }
         southPanel.add(createButton);
         refreshButton.addActionListener(new RefreshButtonListener(this));
@@ -232,11 +234,11 @@ public class StudentGUI extends JFrame {
             out.writeObject(chatRooms);
             getTopicsFromServer();
 
-        } catch(IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
     public void getTopicsFromServer() {
         try {
@@ -246,12 +248,15 @@ public class StudentGUI extends JFrame {
             setTopicsJListModel((DefaultListModel) in.readObject());
             setChatRoomsList((ArrayList<ChatRoomClass>) in.readObject());
             topicsList.setSelectedIndex(index);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        }
+        catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
     public class SignoutButtonListener implements ActionListener {
 
         @Override
@@ -390,18 +395,17 @@ public class StudentGUI extends JFrame {
                         break;
                     }
                 }
-            } else if (SwingUtilities.isRightMouseButton( e )) {
+            }
+            else if (SwingUtilities.isRightMouseButton(e)) {
                 int rowNumber = roomsTable.rowAtPoint(e.getPoint());
                 ListSelectionModel chatLSModel = roomsTable.getSelectionModel();
                 chatLSModel.setSelectionInterval(rowNumber, rowNumber);
-                if (chatLSModel.isSelectionEmpty()==false) {
+                if (chatLSModel.isSelectionEmpty() == false) {
                     RightClickMenu menu = new RightClickMenu(chatLSModel);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         }
-
-
 
         /**
          * class with the constructor that creates menu on right mouse click.
@@ -422,23 +426,25 @@ public class StudentGUI extends JFrame {
                     reportItem.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            new UserReport("chat room", chatRooms.get(chatLSModel.getMinSelectionIndex()).toString(), user.getName(), socket, out, in);
+                            new UserReport("chat room", chatRooms.get(
+                                    chatLSModel.getMinSelectionIndex()).toString(), user.getName(),
+                                    socket, out, in);
                         }
                     });
                 }
 
-                if(user.isAdmin()) {                	
-                	deleteRoom = new JMenuItem("Delete");
-                	add(deleteRoom);
-                	deleteRoom.addActionListener(new ActionListener() {
-                		@Override
-                		public void actionPerformed(ActionEvent e) {
-                			tblMod.removeRow(row);
-                			roomsTable.setModel(tblMod);
-                			sendTopicsToServer(topicsClasses, listModel);
-                			getTopicsFromServer();
-                		}
-                	});
+                if (user.isAdmin()) {
+                    deleteRoom = new JMenuItem("Delete");
+                    add(deleteRoom);
+                    deleteRoom.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            tblMod.removeRow(row);
+                            roomsTable.setModel(tblMod);
+                            sendTopicsToServer(topicsClasses, listModel);
+                            getTopicsFromServer();
+                        }
+                    });
                 }
 
                 upvoteItem = new JMenuItem("Upvote");

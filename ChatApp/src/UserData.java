@@ -1,8 +1,18 @@
 package src;
 
-import javax.swing.*;
-import java.io.*;
+import java.awt.EventQueue;
+import java.awt.Window;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 /**
  * Created by Harry on 06/11/2014.
@@ -15,7 +25,6 @@ public class UserData {
     File users;
     UserClass user;
 
-
     String forgottenPassword;
     String forgottenQuestion;
     String forgottenAnswer;
@@ -24,14 +33,11 @@ public class UserData {
     String[][] userDataRegister;
     static boolean ok = false;
 
-
     File userDataFile;
 
     public UserData(String file) {
         userDataFile = new File(file);
     }
-
-
 
     public boolean loginUser(String studentID, String password) {
         getUserDataLogIn();
@@ -46,6 +52,25 @@ public class UserData {
         }
 
         return false;
+    }
+
+    public UserClass getUserByID(String studentID) {
+        UserClass foundUser = null;
+        getUserDataLogIn();
+        for (String[] row : userDataLogIn) {
+            if (row[1].equals(studentID)) {
+                String[] userInf = new String[6];
+                userInf[0] = row[0];
+                userInf[1] = row[1];
+                userInf[2] = row[2];
+                userInf[3] = row[3];
+                userInf[4] = row[4];
+                userInf[5] = row[5];
+                foundUser = new UserClass(userInf);
+                return foundUser;
+            }
+        }
+        return foundUser;
     }
 
     public String[] getUser() {
@@ -64,7 +89,6 @@ public class UserData {
         }
         return new String[6];
     }
-
 
     public String[][] getUserDataLogIn() {
         users = userDataFile;
@@ -163,7 +187,6 @@ public class UserData {
         return 1;
     }
 
-
     public String[][] getUserDataRegister() {
         users = userDataFile;
 
@@ -201,7 +224,6 @@ public class UserData {
                 count2++;
             }
 
-
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -226,9 +248,115 @@ public class UserData {
         return user;
     }
 
+    public boolean setAdmin(UserClass foundUser, boolean modStatus) {
+        boolean confirmation = false;
+        final File csvFile = new File("users.csv");
+        final File tempFile = new File("temp2.csv");
+
+        String line = "";
+        final String splitBy = ",";
+        BufferedReader br = null;
+        PrintWriter pw = null;
+        System.out.println("START WRITING LINE");
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            pw = new PrintWriter(new FileWriter(tempFile));
+
+            while ((line = br.readLine()) != null) {
+                final String[] temp = line.split(splitBy);
+                if (temp[1].equals(foundUser.getID())) {
+                    continue;
+                }
+                pw.println(line);
+            }
+
+            if (modStatus)
+                pw.print("1");
+            else
+                pw.print("0");
+            pw.print(",");
+            pw.print(foundUser.getID());
+            pw.print(",");
+            pw.print(foundUser.getName());
+            pw.print(",");
+            pw.print(foundUser.getPassword());
+            pw.print(",");
+            pw.print(foundUser.getQuestion());
+            pw.print(",");
+            pw.print(foundUser.getAnswer());
+            pw.println();
+
+            confirmation = true;
+
+        }
+        catch (final Exception ex) {
+            ex.printStackTrace();
+            confirmation = false;
+        }
+        finally {
+            try {
+                br.close();
+            }
+            catch (final IOException e1) {
+                e1.printStackTrace();
+            }
+            pw.close();
+        }
+        csvFile.delete();
+        tempFile.renameTo(new File("users.csv"));
+
+        return confirmation;
+    }
+
     public int updateInfo(UserClass settingsUser, JTextField[] settingsFields) {
 
         int confirmation = 0;
+
+        if (user.isAdmin()) {
+            UserClass foundUser;
+            if (!settingsFields[5].getText().equals("")) {
+                foundUser = getUserByID(settingsFields[5].getText());
+
+                if (foundUser.equals(null)) {
+                    showMessage("User with " + settingsFields[5] + " ID has not beed found!");
+                }
+                else {
+                    if (!foundUser.getID().equals(settingsUser.getID())) {
+
+                        if (setAdmin(foundUser, true)) {
+                            foundUser.setAdmin(true);
+                            confirmation = 1;
+                        }
+                        else
+                            confirmation = 0;
+                    }
+                    else {
+                        showMessage("You cannot change your own moderator status!");
+                    }
+                }
+            }
+            if (!settingsFields[6].getText().equals("")) {
+                foundUser = getUserByID(settingsFields[6].getText());
+                if (foundUser.equals(null)) {
+                    showMessage("User with " + settingsFields[6] + " ID has not beed found!");
+                }
+                else {
+                    if (!foundUser.getID().equals(settingsUser.getID())) {
+
+                        if (setAdmin(foundUser, false)) {
+                            foundUser.setAdmin(false);
+                            confirmation = 1;
+                        }
+                        else
+                            confirmation = 0;
+                    }
+                    else {
+                        showMessage("You cannot change your own moderator status!");
+                    }
+                }
+            }
+        }
+
         final File csvFile = new File("users.csv");
         final File tempFile = new File("temp.csv");
 
@@ -249,7 +377,11 @@ public class UserData {
                 pw.println(line);
             }
 
-            pw.print("0");
+            if (settingsUser.isAdmin())
+                pw.print("1");
+            else
+                pw.print("0");
+
             pw.print(",");
             pw.print(settingsUser.getID());
             pw.print(",");
@@ -264,22 +396,23 @@ public class UserData {
             }
 
             pw.print(",");
-            if (!(settingsFields[1].getText().equals(""))) {
+            if (!(settingsFields[1].getText().equals(""))
+                    && !(settingsFields[2].getText().equals(""))) {
                 if (settingsFields[1].getText().equals(settingsFields[2].getText())) {
                     pw.print(settingsFields[1].getText());
                     settingsUser.setPassword(settingsFields[1].getText());
                     confirmation = 1;
                 }
                 else {
-                    JOptionPane.showMessageDialog(new JFrame(), "Password fields don't match!");
+                    showMessage("Password fields don't match!");
                     settingsFields[1].setText("");
                     settingsFields[2].setText("");
+                    pw.print(settingsUser.getPassword());
                 }
             }
             else {
                 pw.print(settingsUser.getPassword());
             }
-
             pw.print(",");
             if (!settingsFields[3].getText().equals("")) {
                 pw.print(settingsFields[3].getText());
@@ -319,6 +452,16 @@ public class UserData {
         tempFile.renameTo(new File("users.csv"));
 
         return confirmation;
+    }
+
+    public void showMessage(final String messageDialog) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane message = new JOptionPane(messageDialog);
+                message.setVisible(true);
+            }
+        });
     }
 
     public boolean validateID(String userID) {
