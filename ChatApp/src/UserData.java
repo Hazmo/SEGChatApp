@@ -1,7 +1,6 @@
 package src;
 
 import java.awt.EventQueue;
-import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
@@ -309,7 +309,8 @@ public class UserData {
     }
 
     public int updateInfo(UserClass settingsUser, JTextField[] settingsFields) {
-
+        showMessage("You cannot change your own moderator status!");
+        int ok = 0;
         int confirmation = 0;
 
         if (user.isAdmin()) {
@@ -326,11 +327,13 @@ public class UserData {
                         if (setAdmin(foundUser, true)) {
                             foundUser.setAdmin(true);
                             confirmation = 1;
+
                         }
                         else
                             confirmation = 0;
                     }
                     else {
+                        ok = 2;
                         showMessage("You cannot change your own moderator status!");
                     }
                 }
@@ -351,6 +354,7 @@ public class UserData {
                             confirmation = 0;
                     }
                     else {
+                        ok = 2;
                         showMessage("You cannot change your own moderator status!");
                     }
                 }
@@ -368,7 +372,6 @@ public class UserData {
         try {
             br = new BufferedReader(new FileReader(csvFile));
             pw = new PrintWriter(new FileWriter(tempFile));
-
             while ((line = br.readLine()) != null) {
                 final String[] temp = line.split(splitBy);
                 if (temp[1].equals(settingsUser.getID())) {
@@ -405,6 +408,7 @@ public class UserData {
                 }
                 else {
                     showMessage("Password fields don't match!");
+                    ok = 1;
                     settingsFields[1].setText("");
                     settingsFields[2].setText("");
                     pw.print(settingsUser.getPassword());
@@ -450,7 +454,10 @@ public class UserData {
         }
         csvFile.delete();
         tempFile.renameTo(new File("users.csv"));
-
+        if (ok == 1)
+            return 4;
+        if (ok == 2)
+            return 5;
         return confirmation;
     }
 

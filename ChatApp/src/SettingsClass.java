@@ -171,6 +171,17 @@ public class SettingsClass extends JFrame implements ActionListener {
                     this.dispose();
                     break;
                 }
+                case (4): {
+                    JOptionPane.showMessageDialog(this, "The password fields don't match!");
+                    this.dispose();
+                    break;
+                }
+                case (5): {
+                    JOptionPane.showMessageDialog(this,
+                            "You cannot modify your own moderator status!");
+                    this.dispose();
+                    break;
+                }
                 }
 
                 this.dispose();
