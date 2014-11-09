@@ -427,17 +427,19 @@ public class StudentGUI extends JFrame {
                     });
                 }
 
-                deleteRoom = new JMenuItem("Delete");
-                add(deleteRoom);
-                deleteRoom.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        tblMod.removeRow(row);
-                        roomsTable.setModel(tblMod);
-                        sendTopicsToServer(topicsClasses, listModel);
-                        getTopicsFromServer();
-                    }
-                });
+                if(user.isAdmin()) {                	
+                	deleteRoom = new JMenuItem("Delete");
+                	add(deleteRoom);
+                	deleteRoom.addActionListener(new ActionListener() {
+                		@Override
+                		public void actionPerformed(ActionEvent e) {
+                			tblMod.removeRow(row);
+                			roomsTable.setModel(tblMod);
+                			sendTopicsToServer(topicsClasses, listModel);
+                			getTopicsFromServer();
+                		}
+                	});
+                }
 
                 upvoteItem = new JMenuItem("Upvote");
                 add(upvoteItem);
