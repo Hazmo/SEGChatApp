@@ -51,21 +51,6 @@ public class ChatServer {
         MainServerThread tlst = new MainServerThread(mainServerSocket);
         tlst.start();
 
-        RegisterThread rt = new RegisterThread(registerServer);
-        rt.start();
-
-        SettingsThread st = new SettingsThread(settingsServer);
-        st.start();
-
-        ForgottenPassThread fpt = new ForgottenPassThread(forgottenServer);
-        fpt.start();
-
-        TopicsServerThread tt = new TopicsServerThread(topicsServer);
-        tt.start();
-        
-        ReportThread repSer = new ReportThread(reportServer, reports);
-        repSer.start();
-
         MainChatThread mct = new MainChatThread(server);
         mct.start();
     }

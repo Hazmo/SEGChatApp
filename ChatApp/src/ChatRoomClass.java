@@ -80,6 +80,28 @@ public class ChatRoomClass implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        System.out.println("actually entering");
+        if(obj == null) {
+            System.out.println("here");
+            return false;
+        }
+        if(getClass() != obj.getClass()) {
+            System.out.println("here 2");
+            return false;
+        }
+        final ChatRoomClass other = (ChatRoomClass) obj;
+        if(!this.name.equals(other.name) && !this.topicName.equals(other.topicName)) {
+            System.out.println(this.name + " " + other.name + "     " + this.topicName + " " + other.topicName);
+            System.out.println("here 3");
+            return false;
+        }
+        return true;
+    }
+
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 53 * hash + this.topicName.hashCode();
+        return hash;
     }
 }
