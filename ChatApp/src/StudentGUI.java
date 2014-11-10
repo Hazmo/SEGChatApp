@@ -72,7 +72,7 @@ public class StudentGUI extends JFrame {
     JScrollPane tableScrollPane = new JScrollPane(this.roomsTable);
 
     /** The predefined topics. */
-    String[] topics = { "Informatics", "Mathematics","Science", "History", "English", "Philosophy", "Classics","Languages"};
+    String[] topics = { "Informatics", "Mathematics" };
 
     /** The table model used by the table of chat rooms. */
     DefaultTableModel tableModel;
@@ -81,7 +81,7 @@ public class StudentGUI extends JFrame {
     ArrayList<ChatRoomClass> chatRooms = new ArrayList<ChatRoomClass>();
 
     /** Column headers for the table */
-    String[] columnHeaders = { "Room Name", "Description", "Votes", "Topic" };
+    String[] columnHeaders = { "Room Name", "Users", "Description", "Votes", "Topic" };
 
     /** The button used to refresh the list of chat rooms. */
     JButton refreshButton = new JButton("Refresh List");
@@ -153,8 +153,8 @@ public class StudentGUI extends JFrame {
             }
         });
 
-        roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
-        roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
+        roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
+        roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
 
         roomsTable.addMouseListener(new TableMouseListener());
         tableModel = (DefaultTableModel) roomsTable.getModel();
@@ -530,8 +530,8 @@ public class StudentGUI extends JFrame {
             for (final TopicClass topic : topicsClasses) {
                 if (topic.topicName.equals(topicString)) {
                     roomsTable.setModel(topic.getTableModel());
-                    roomsTable.getColumnModel().getColumn(3).setMinWidth(0);
-                    roomsTable.getColumnModel().getColumn(3).setMaxWidth(0);
+                    roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
+                    roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
 
                 }
             }

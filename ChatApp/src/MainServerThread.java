@@ -14,7 +14,7 @@ public class MainServerThread extends Thread {
 
     ServerSocket server;
 
-    String initialTopics[] = {"Informatics", "Mathematics", "Science", "History", "English", "Philosophy", "Classics","Languages"};
+    String initialTopics[] = { "Informatics", "Mathematics" };
     ArrayList<TopicClass> topics = new ArrayList<>();
     DefaultListModel topicsModel = new DefaultListModel();
     ArrayList<ChatRoomClass> chatRooms = new ArrayList<>();
