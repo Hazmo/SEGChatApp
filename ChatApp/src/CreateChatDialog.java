@@ -89,7 +89,7 @@ public class CreateChatDialog extends JFrame {
         center.add(descriptionLabel);
         center.add(descriptionArea);
 
-        SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
+        SwingUtilities.getRootPane(this).setDefaultButton(okButton);
 
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         okButton.addActionListener(new OkButtonListener(studentFrame, this));
