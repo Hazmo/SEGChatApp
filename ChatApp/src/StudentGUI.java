@@ -72,7 +72,7 @@ public class StudentGUI extends JFrame {
     JScrollPane tableScrollPane = new JScrollPane(this.roomsTable);
 
     /** The predefined topics. */
-    String[] topics = { "Informatics", "Mathematics" };
+    String[] topics = { "Informatics", "Mathematics", "Science", "History", "English", "Philosophy", "Classics","Languages"};
 
     /** The table model used by the table of chat rooms. */
     DefaultTableModel tableModel;
