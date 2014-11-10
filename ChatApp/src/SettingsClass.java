@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  * The class used as a frame for the settings that the user can access.
@@ -119,6 +120,8 @@ public class SettingsClass extends JFrame implements ActionListener {
             }
 
         });
+
+        SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
 
         setVisible(true);
         setLocationRelativeTo(null);

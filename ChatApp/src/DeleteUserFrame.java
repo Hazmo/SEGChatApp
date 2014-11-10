@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class DeleteUserFrame extends JFrame implements ActionListener {
 
@@ -60,6 +61,7 @@ public class DeleteUserFrame extends JFrame implements ActionListener {
         final JPanel south = new JPanel(new FlowLayout());
         south.add(okButton);
         south.add(cancelButton);
+        SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
 
         add(center);
         add(south, BorderLayout.SOUTH);

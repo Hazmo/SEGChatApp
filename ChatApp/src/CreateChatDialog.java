@@ -1,6 +1,5 @@
 package src;
 
-
 /**
  *  @author Codrin Gidei - 1326651
  *  @email codrin.gidei@kcl.ac.uk
@@ -22,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  * The class / frame used to create a new chat room.
@@ -58,14 +58,11 @@ public class CreateChatDialog extends JFrame {
     /** The model used by the topics ComboBox */
     DefaultComboBoxModel topicsModel;
 
-
-
     /**
      * Instantiates the CreateChatDialog class
      * @param studentFrame
      *        the frame containing the student GUI
      */
-
 
     public CreateChatDialog(StudentGUI studentFrame) {
         this.studentFrame = studentFrame;
@@ -91,6 +88,8 @@ public class CreateChatDialog extends JFrame {
         center.add(chatRoomField);
         center.add(descriptionLabel);
         center.add(descriptionArea);
+
+        SwingUtilities.getRootPane(okButton).setDefaultButton(okButton);
 
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         okButton.addActionListener(new OkButtonListener(studentFrame, this));
@@ -147,7 +146,6 @@ public class CreateChatDialog extends JFrame {
                             studentFrame.listModel);
                 }
             }
-
 
             this.parent.dispose();
 

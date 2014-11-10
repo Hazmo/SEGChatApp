@@ -1,4 +1,5 @@
 package src;
+
 /**
  * @author Ainur Makhmet - 1320744
  * @email ainur.makhmet@kcl.ac.uk
@@ -15,6 +16,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -23,6 +25,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 /**
  * Extends JFrame and contains only one constructor.
  */
@@ -44,12 +48,12 @@ class ForgottenPasswordFrame extends JFrame implements ActionListener {
      * remember his password. If the user answers to the secret question correctly, then the
      * password appears underneath the answer, else the user is notified the the answer is wrong.
      * @param password
-     * is the user's forgotten password.
+     *        is the user's forgotten password.
      * @param question
-     * is the secret question that the student introduced when was filling the registration
-     * form.
+     *        is the secret question that the student introduced when was filling the registration
+     *        form.
      * @param answer
-     * is the answer to the secret question that has been introduced by the student himself.
+     *        is the answer to the secret question that has been introduced by the student himself.
      */
     ForgottenPasswordFrame(Socket socket, ObjectOutputStream out, ObjectInputStream in) {
 
@@ -58,15 +62,10 @@ class ForgottenPasswordFrame extends JFrame implements ActionListener {
         this.in = in;
 
         /**
-        try {
-            socket = new Socket("localhost", 4457);
-            out = new ObjectOutputStream(socket.getOutputStream());
-            in = new ObjectInputStream(socket.getInputStream());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
+         * try { socket = new Socket("localhost", 4457); out = new
+         * ObjectOutputStream(socket.getOutputStream()); in = new
+         * ObjectInputStream(socket.getInputStream()); } catch (Exception e) { e.printStackTrace();
+         * }
          */
         setDefaultCloseOperation(this.DISPOSE_ON_CLOSE);
         setTitle("Password Retrieval");
@@ -98,12 +97,15 @@ class ForgottenPasswordFrame extends JFrame implements ActionListener {
         add(IDInputPanel);
         add(questionLabel);
         add(answerInputPanel);
+
+        SwingUtilities.getRootPane(getQuestionButton).setDefaultButton(getQuestionButton);
+
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 try {
-                    //socket.close();
-                   //in.close();
-                    //out.close();
+                    // socket.close();
+                    // in.close();
+                    // out.close();
                 }
                 catch (Exception ex) {
                     ex.printStackTrace();
@@ -115,6 +117,7 @@ class ForgottenPasswordFrame extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
         setVisible(true);
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().matches("questionButton")) {
@@ -126,6 +129,8 @@ class ForgottenPasswordFrame extends JFrame implements ActionListener {
                 confirm = (boolean) in.readObject();
                 if (confirm) {
                     getQuestionButton.setEnabled(false);
+                    SwingUtilities.getRootPane(getPassButton).setDefaultButton(getPassButton);
+
                     questionLabel.setText("Question: " + in.readObject());
                 }
                 else {

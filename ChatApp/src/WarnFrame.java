@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class WarnFrame extends JFrame implements ActionListener {
 

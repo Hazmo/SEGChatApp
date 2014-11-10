@@ -7,7 +7,6 @@ package src;
 //import sun.plugin2.message.Message;
 
 import java.awt.BorderLayout;
-
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
