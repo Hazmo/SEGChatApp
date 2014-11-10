@@ -39,10 +39,6 @@ public class ChatGUI extends JFrame {
     DefaultListModel<String> chatModel = new DefaultListModel<String>();
     JScrollPane jsp = new JScrollPane(chatWindow);
     
-    JList userWindow = new JList();
-    DefaultListModel<String> userModel = new DefaultListModel<String>();
-    JScrollPane jsp2 = new JScrollPane(userWindow);
-    
     JTextField enterText = new JTextField();
     JButton send = new JButton("Send");
 
@@ -57,9 +53,6 @@ public class ChatGUI extends JFrame {
 
         setTitle(chatRoom.toString());
         chatWindow.setModel(chatModel);
-
-        userWindow.setModel(userModel);
-        userModel.addElement(user.getName());
 
         enterText.setColumns(10);
         SwingUtilities.getRootPane(this).setDefaultButton(send);
@@ -90,10 +83,21 @@ public class ChatGUI extends JFrame {
                     this.reportItem = new JMenuItem("Report");
                     this.add(this.reportItem);
                     this.reportItem.addActionListener(new ActionListener() {
-                        @Override
+                    	@Override
                         public void actionPerformed(ActionEvent e) {
                             String messageTitle =chatWindow.getSelectedValue().toString();
-                            new UserReport("message", messageTitle, user.getName(), socket, out, in);
+                            try {
+								Socket repSock = new Socket("localhost", 4455);
+								ObjectOutputStream repOut = new ObjectOutputStream(repSock.getOutputStream());
+					            ObjectInputStream repIn = new ObjectInputStream(repSock.getInputStream());
+								new UserReport("message", messageTitle, user.getName(), socket, repOut, repIn);
+							} catch (UnknownHostException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
                         }
                     });
                 }
@@ -146,14 +150,9 @@ public class ChatGUI extends JFrame {
     }
     public void setLayout() {
         JPanel center = new JPanel(new BorderLayout());
-        JPanel centerWindow = new JPanel(new BorderLayout());
-        centerWindow.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        centerWindow.add(jsp, BorderLayout.CENTER);
-        center.add(centerWindow, BorderLayout.CENTER);
-        JPanel eastWindow = new JPanel(new BorderLayout());
-        eastWindow.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 20));
-        eastWindow.add(jsp2, BorderLayout.CENTER);
-        center.add(eastWindow, BorderLayout.EAST);
+        center.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        center.add(jsp, BorderLayout.CENTER);
+        
         JPanel jp = new JPanel(new FlowLayout());
 
         jp.add(enterText);
