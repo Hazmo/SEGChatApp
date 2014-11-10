@@ -155,6 +155,8 @@ public class StudentGUI extends JFrame {
 
         roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
         roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
+        roomsTable.getColumnModel().getColumn(1).setMinWidth(0);
+        roomsTable.getColumnModel().getColumn(1).setMaxWidth(0);
 
         roomsTable.addMouseListener(new TableMouseListener());
         tableModel = (DefaultTableModel) roomsTable.getModel();
@@ -339,6 +341,8 @@ public class StudentGUI extends JFrame {
 
             roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
             roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
+            roomsTable.getColumnModel().getColumn(1).setMinWidth(0);
+            roomsTable.getColumnModel().getColumn(1).setMaxWidth(0);
         }
 
         @Override
@@ -532,6 +536,8 @@ public class StudentGUI extends JFrame {
                     roomsTable.setModel(topic.getTableModel());
                     roomsTable.getColumnModel().getColumn(4).setMinWidth(0);
                     roomsTable.getColumnModel().getColumn(4).setMaxWidth(0);
+                    roomsTable.getColumnModel().getColumn(1).setMinWidth(0);
+                    roomsTable.getColumnModel().getColumn(1).setMaxWidth(0);
 
                 }
             }
