@@ -343,7 +343,6 @@ public class StudentGUI extends JFrame {
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            System.out.println("socket.isClosed() = " + socket.isClosed());
             if (!searchField.getText().equals("")) {
                 final ArrayList<ChatRoomClass> results = getResults(searchField.getText()
                         .toLowerCase());
@@ -390,14 +389,12 @@ public class StudentGUI extends JFrame {
         @Override
         public void mouseClicked(final MouseEvent e) {
             if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-                System.out.println("double click");
                 int rowIndex = roomsTable.getSelectedRow();
                 String topicString = (String) roomsTable.getModel().getValueAt(rowIndex, 4);
                 for (TopicClass topic : topicsClasses) {
                     if (topic.toString().equals(topicString)) {
                         for (ChatRoomClass chatRoom : topic.getChatRooms()) {
                             if (chatRoom.name.equals(roomsTable.getModel().getValueAt(rowIndex, 0))) {
-                                System.out.println("yeahhh");
                                 new ChatGUI(chatRoom, user);
                                 break;
                             }
@@ -478,7 +475,6 @@ public class StudentGUI extends JFrame {
                                 if (e.getSource().equals(upvoteItem))
                                     chatRoom.votes++;
                                 topic.tableModel.setValueAt(chatRoom.votes, rowIndex, 3);
-                                System.out.println(chatRoom.votes);
                                 break;
                             }
                         }

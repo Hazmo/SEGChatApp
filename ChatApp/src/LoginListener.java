@@ -105,16 +105,15 @@ public class LoginListener implements ActionListener {
             }
         }
         if (login_true == true) {
-            System.out.println("Correct login");
-//            try {
-//                socket = new Socket("localhost", 446);
-//                out = new ObjectOutputStream(socket.getOutputStream());
-//                in = new ObjectInputStream(socket.getInputStream());
-//            }
-//            catch (Exception e) {
-//                e.printStackTrace();
-//            }
-            //new StudentGUI(new UserClass(userLoginData));
+            // try {
+            // socket = new Socket("localhost", 446);
+            // out = new ObjectOutputStream(socket.getOutputStream());
+            // in = new ObjectInputStream(socket.getInputStream());
+            // }
+            // catch (Exception e) {
+            // e.printStackTrace();
+            // }
+            // new StudentGUI(new UserClass(userLoginData));
         }
         else {
             JOptionPane.showMessageDialog(null, "No such login");

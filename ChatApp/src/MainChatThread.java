@@ -30,7 +30,6 @@ public class MainChatThread extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("MainChatThread");
         }
 
     }

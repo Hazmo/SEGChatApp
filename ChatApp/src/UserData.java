@@ -256,7 +256,6 @@ public class UserData {
             csvFile.delete();
             tempFile.renameTo(new File("users.csv"));
         }
-        System.out.println("CONFIRMATION: " + confirmation);
         return confirmation;
 
     }
@@ -371,7 +370,6 @@ public class UserData {
         final String splitBy = ",";
         BufferedReader br = null;
         PrintWriter pw = null;
-        System.out.println("START WRITING LINE");
         try {
             br = new BufferedReader(new FileReader(csvFile));
             pw = new PrintWriter(new FileWriter(tempFile));

@@ -56,13 +56,9 @@ public class MainServerSocketThread extends Thread {
                 else if (message.getMessageType().equals("log_in")) {
                     studentID = message.getMessage();
                     password = (String) message.getExtraData()[0];
-                    System.out.println("studentID = " + studentID);
-                    System.out.println("password = " + password);
 
                     boolean loggedIn = userData.loginUser(studentID, password);
 
-                    System.out
-                            .println("Boolean.toString(loggedIn) = " + Boolean.toString(loggedIn));
                     out.writeObject(new MessageClass("logged_in", Boolean.toString(loggedIn)));
                     if (loggedIn) {
                         user = userData.getUserClass();
@@ -103,9 +99,7 @@ public class MainServerSocketThread extends Thread {
                 }
                 else if (message.getMessageType().equals("update_settings")) {
                     JTextField settingsFields[] = (JTextField[]) in.readObject();
-                    for (JTextField settings : settingsFields) {
-                        System.out.println("settings. = " + settings.getText());
-                    }
+
                     UserClass settingsUser = (UserClass) in.readObject();
                     out.writeObject(userData.updateInfo(settingsUser, settingsFields));
 
@@ -163,9 +157,7 @@ public class MainServerSocketThread extends Thread {
                     out.writeObject(server.getWarning(message.getMessage()));
                 }
                 else if (message.getMessageType().equals("add_warning")) {
-                    System.out.println("BEFORE CONFIRM");
                     int confirm = userData.addWarning(message.getMessage());
-                    System.out.println("CONFIRM IS: " + confirm);
                     out.writeObject(confirm);
                     if (confirm == 2) {
                         server.addWarning((WarningClass) in.readObject());

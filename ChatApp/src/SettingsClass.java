@@ -144,7 +144,6 @@ public class SettingsClass extends JFrame implements ActionListener {
                         questionField, answerField, modAppointField, modDismissField };
 
                 try {
-                    System.out.println(jFields[0].getText());
                     out.writeObject(new MessageClass("update_settings", ""));
                     out.writeObject(jFields);
                     out.writeObject(user);
