@@ -7,11 +7,6 @@ import java.util.ArrayList;
 public class ChatServer {
 
     ServerSocket server;
-    ServerSocket registerServer;
-    ServerSocket loginServer;
-    ServerSocket settingsServer;
-    ServerSocket forgottenServer;
-    ServerSocket topicsServer;
     ServerSocket mainServerSocket;
 
     ServerSocket reportServer;
@@ -36,8 +31,6 @@ public class ChatServer {
             System.exit(-1);
         }
 
-        // LoginThread lt = new LoginThread(loginServer);
-        // lt.start();
 
         MainServerThread tlst = new MainServerThread(mainServerSocket);
         tlst.start();
