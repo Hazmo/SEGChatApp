@@ -31,7 +31,7 @@ public class TopicClass implements Serializable {
     public TopicClass(String topicName) {
         chatRooms = new ArrayList<ChatRoomClass>();
         this.topicName = topicName;
-        String[] columnHeaders = { "Room Name", "Users", "Description", "Votes", "Topics" };
+        String[] columnHeaders = { "Room Name", "Description", "Votes", "Topics" };
         tableModel = new DefaultTableModel(columnHeaders, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {

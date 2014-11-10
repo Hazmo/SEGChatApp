@@ -78,7 +78,7 @@ public class CreateChatDialog extends JFrame {
     public void setLayout() {
         JPanel center = new JPanel(new GridLayout(4, 4));
 
-        String[] topics = { "Informatics", "Mathematics" };
+        String[] topics = { "Informatics", "Mathematics", "Science", "History", "English", "Philosophy", "Classics","Languages"};
         topicsModel = new DefaultComboBoxModel(topics);
         topicsComboBox.setModel(topicsModel);
 
