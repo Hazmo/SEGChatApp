@@ -50,7 +50,9 @@ public class StudentGUI extends JFrame {
     JButton settingsButton = new JButton("Settings");
 
     /** The moderator reports button. */
-    JButton reportsButton = new JButton("Mod Reports");
+    JButton reportsButton = new JButton("User Reports");
+
+    JButton warningsButton = new JButton("Moderator Warnings");
 
     /** The topics list. */
     JList topicsList = new JList();
@@ -189,10 +191,19 @@ public class StudentGUI extends JFrame {
             reportsButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    new ModeratorReports(socket, out, in);
+                    new ModeratorReports(socket, out, in, user);
                 }
             });
             southPanel.add(reportsButton);
+        }
+        else {
+            warningsButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new UserWarnings(user.getID(), socket, out, in);
+                }
+            });
+            southPanel.add(warningsButton);
         }
         southPanel.add(createButton);
         refreshButton.addActionListener(new RefreshButtonListener(this));

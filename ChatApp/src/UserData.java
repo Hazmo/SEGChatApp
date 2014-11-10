@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
@@ -59,13 +58,14 @@ public class UserData {
         getUserDataLogIn();
         for (String[] row : userDataLogIn) {
             if (row[1].equals(studentID)) {
-                String[] userInf = new String[6];
+                String[] userInf = new String[7];
                 userInf[0] = row[0];
                 userInf[1] = row[1];
                 userInf[2] = row[2];
                 userInf[3] = row[3];
                 userInf[4] = row[4];
                 userInf[5] = row[5];
+                userInf[6] = row[6];
                 foundUser = new UserClass(userInf);
                 return foundUser;
             }
@@ -76,14 +76,14 @@ public class UserData {
     public String[] getUser() {
         for (String[] row : userDataLogIn) {
             if (row[1].equals(studentID)) {
-                String[] userInf = new String[6];
+                String[] userInf = new String[7];
                 userInf[0] = row[0];
                 userInf[1] = row[1];
                 userInf[2] = row[2];
                 userInf[3] = row[3];
                 userInf[4] = row[4];
                 userInf[5] = row[5];
-
+                userInf[6] = row[6];
                 return userInf;
             }
         }
@@ -108,7 +108,7 @@ public class UserData {
             e1.printStackTrace();
         }
 
-        userDataLogIn = new String[count][6];
+        userDataLogIn = new String[count][7];
 
         String csvFile = "users.csv";
         BufferedReader br = null;
@@ -126,6 +126,7 @@ public class UserData {
                 userDataLogIn[count2][3] = temp[3];
                 userDataLogIn[count2][4] = temp[4];
                 userDataLogIn[count2][5] = temp[5];
+                userDataLogIn[count2][6] = temp[6];
                 count2++;
             }
         }
@@ -147,6 +148,117 @@ public class UserData {
         }
 
         return userDataLogIn;
+    }
+
+    public int deleteUser(String userID) {
+        UserClass foundUser = getUserByID(userID);
+        if (foundUser == null)
+            return 4;
+        int confirmation = 0;
+        final File csvFile = new File("users.csv");
+        final File tempFile = new File("temp3.csv");
+
+        String line = "";
+        final String splitBy = ",";
+        BufferedReader br = null;
+        PrintWriter pw = null;
+        try {
+            br = new BufferedReader(new FileReader(csvFile));
+            pw = new PrintWriter(new FileWriter(tempFile));
+
+            while ((line = br.readLine()) != null) {
+                final String[] temp = line.split(splitBy);
+                if (temp[1].equals(foundUser.getID())) {
+                    continue;
+                }
+                pw.println(line);
+            }
+            confirmation = 1;
+        }
+        catch (final IOException ex) {
+            ex.printStackTrace();
+            confirmation = 2;
+        }
+        finally {
+            try {
+                br.close();
+            }
+            catch (final IOException e1) {
+                e1.printStackTrace();
+            }
+            pw.close();
+        }
+        csvFile.delete();
+        tempFile.renameTo(new File("users.csv"));
+        return confirmation;
+    }
+
+    public int addWarning(String userID) {
+        UserClass foundUser = getUserByID(userID);
+        int confirmation = 0;
+        if (foundUser == null) {
+            confirmation = 1;
+        }
+        else {
+            final File csvFile = new File("users.csv");
+            final File tempFile = new File("temp3.csv");
+
+            String line = "";
+            final String splitBy = ",";
+            BufferedReader br = null;
+            PrintWriter pw = null;
+            try {
+                br = new BufferedReader(new FileReader(csvFile));
+                pw = new PrintWriter(new FileWriter(tempFile));
+
+                while ((line = br.readLine()) != null) {
+                    final String[] temp = line.split(splitBy);
+                    if (temp[1].equals(foundUser.getID())) {
+                        continue;
+                    }
+                    pw.println(line);
+                }
+
+                if (foundUser.isAdmin())
+                    pw.print("1");
+                else
+                    pw.print("0");
+                pw.print(",");
+                pw.print(foundUser.getID());
+                pw.print(",");
+                pw.print(foundUser.getName());
+                pw.print(",");
+                pw.print(foundUser.getPassword());
+                pw.print(",");
+                pw.print(foundUser.getQuestion());
+                pw.print(",");
+                pw.print(foundUser.getAnswer());
+                pw.print(",");
+                pw.print(Integer.parseInt(foundUser.getWarnings()) + 1);
+                pw.println();
+
+                confirmation = 2;
+
+            }
+            catch (final Exception ex) {
+                ex.printStackTrace();
+                confirmation = 3;
+            }
+            finally {
+                try {
+                    br.close();
+                }
+                catch (final IOException e1) {
+                    e1.printStackTrace();
+                }
+                pw.close();
+            }
+            csvFile.delete();
+            tempFile.renameTo(new File("users.csv"));
+        }
+        System.out.println("CONFIRMATION: " + confirmation);
+        return confirmation;
+
     }
 
     public int registerUser(JTextField jFields[]) {
@@ -172,6 +284,8 @@ public class UserData {
         toFileWriter.print(jFields[4].getText());
         toFileWriter.print(",");
         toFileWriter.print(jFields[5].getText().toLowerCase());
+        toFileWriter.print(",");
+        toFileWriter.print("0");
         toFileWriter.println();
 
         toFileWriter.flush();
@@ -284,6 +398,8 @@ public class UserData {
             pw.print(foundUser.getQuestion());
             pw.print(",");
             pw.print(foundUser.getAnswer());
+            pw.print(",");
+            pw.print(foundUser.getWarnings());
             pw.println();
 
             confirmation = true;
@@ -315,11 +431,13 @@ public class UserData {
 
         if (user.isAdmin()) {
             UserClass foundUser;
+
             if (!settingsFields[5].getText().equals("")) {
                 foundUser = getUserByID(settingsFields[5].getText());
 
-                if (foundUser.equals(null)) {
-                    showMessage("User with " + settingsFields[5] + " ID has not beed found!");
+                if (foundUser == null) {
+                    showMessage("User with " + settingsFields[5] + " ID has not been found!");
+                    ok = 3;
                 }
                 else {
                     if (!foundUser.getID().equals(settingsUser.getID())) {
@@ -340,8 +458,9 @@ public class UserData {
             }
             if (!settingsFields[6].getText().equals("")) {
                 foundUser = getUserByID(settingsFields[6].getText());
-                if (foundUser.equals(null)) {
-                    showMessage("User with " + settingsFields[6] + " ID has not beed found!");
+                if (foundUser == null) {
+                    showMessage("User with " + settingsFields[6] + " ID has not been found!");
+                    ok = 4;
                 }
                 else {
                     if (!foundUser.getID().equals(settingsUser.getID())) {
@@ -436,6 +555,8 @@ public class UserData {
             else {
                 pw.print(settingsUser.getAnswer());
             }
+            pw.print(",");
+            pw.print(settingsUser.getWarnings());
             pw.println();
 
         }
@@ -454,10 +575,27 @@ public class UserData {
         }
         csvFile.delete();
         tempFile.renameTo(new File("users.csv"));
-        if (ok == 1)
+
+        switch (ok) {
+        case (1): {
             return 4;
-        if (ok == 2)
+        }
+        case (2): {
             return 5;
+        }
+        case (3): {
+            return 6;
+        }
+        case (4): {
+            return 7;
+        }
+        case (5): {
+            return 8;
+        }
+        case (6): {
+            return 9;
+        }
+        }
         return confirmation;
     }
 

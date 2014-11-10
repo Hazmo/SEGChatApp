@@ -1,5 +1,5 @@
-
 package src;
+
 import java.io.Serializable;
 
 public class UserClass implements Serializable {
@@ -70,5 +70,9 @@ public class UserClass implements Serializable {
 
     public void setPassword(final String password) {
         this.userData[3] = password;
+    }
+
+    public String getWarnings() {
+        return userData[6];
     }
 }

@@ -24,49 +24,51 @@ import javax.swing.event.ListSelectionListener;
 
 public class ModeratorReports extends JFrame {
 
-	private JList reportsList = new JList();
-	private JTextArea reportDesc = new JTextArea();
-	private JButton resolveIssue = new JButton("Resolve Issue");
-	private JButton backButton = new JButton("Back");
-	private ArrayList<ReportClass> reports;
-
-
-	Socket socket;
+    private JList reportsList = new JList();
+    private JTextArea reportDesc = new JTextArea();
+    private JButton resolveIssue = new JButton("Resolve Issue");
+    private JButton warnButton = new JButton("Check / Send Warning");
+    private JButton deleteButton = new JButton("Delete User");
+    private ArrayList<ReportClass> reports;
+    private UserClass user;
+    Socket socket;
     ObjectOutputStream out;
     ObjectInputStream in;
 
-	ModeratorReports(Socket socket, ObjectOutputStream out, ObjectInputStream in) {
+    ModeratorReports(Socket socket, ObjectOutputStream out, ObjectInputStream in, UserClass user) {
         this.socket = socket;
         this.out = out;
         this.in = in;
-		initGUI();
-	}
-	
-	void initGUI() {
-		JPanel centrePanel = new JPanel(new BorderLayout());
-		reportsList.addListSelectionListener(new ListSelectionListener() {
+        this.user = user;
+        initGUI();
+    }
 
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				if(!reportsList.isSelectionEmpty()) {					
-					ReportClass rep = reports.get(reportsList.getSelectedIndex());
-					reportDesc.setText(rep.getReportMessage());
-				}
-			}
-			
-		});
-		JScrollPane rplPane = new JScrollPane(reportsList);
-		JScrollPane textPane = new JScrollPane(reportDesc);
-		reportDesc.setEditable(false);
-		centrePanel.setBorder(BorderFactory.createEmptyBorder(10,10,0,10));
-		centrePanel.add(rplPane, BorderLayout.CENTER);
-		centrePanel.add(textPane, BorderLayout.SOUTH);
-		add(centrePanel, BorderLayout.CENTER);
+    void initGUI() {
+        JPanel centrePanel = new JPanel(new BorderLayout());
+        reportsList.addListSelectionListener(new ListSelectionListener() {
 
-        try{    //out.writeObject(new String("READ"));
+            @Override
+            public void valueChanged(ListSelectionEvent arg0) {
+                if (!reportsList.isSelectionEmpty()) {
+                    ReportClass rep = reports.get(reportsList.getSelectedIndex());
+                    reportDesc.setText(rep.getReportMessage());
+                }
+            }
+
+        });
+        JScrollPane rplPane = new JScrollPane(reportsList);
+        JScrollPane textPane = new JScrollPane(reportDesc);
+        reportDesc.setEditable(false);
+        centrePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        centrePanel.add(rplPane, BorderLayout.CENTER);
+        centrePanel.add(textPane, BorderLayout.SOUTH);
+        add(centrePanel, BorderLayout.CENTER);
+
+        try { // out.writeObject(new String("READ"));
             out.writeObject(new MessageClass("get_reports", ""));
             reports = (ArrayList<ReportClass>) in.readObject();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             if (e.getClass().equals(IOException.class)) {
                 System.out.println("Accept failed: 4457");
                 System.exit(-1);
@@ -74,63 +76,73 @@ public class ModeratorReports extends JFrame {
             else if (e.getClass().equals(ClassNotFoundException.class))
                 e.printStackTrace();
         }
-		
-		setReports();
-		
-		JPanel bottomPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-		resolveIssue.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(reportsList.isSelectionEmpty()) {
-					JOptionPane.showMessageDialog(null, "Please select a report first.");
-				} else {
-					int repElem = reportsList.getSelectedIndex();
-					ReportClass rep = reports.get(repElem);
-					
-					if(rep.isOpen()) {
-						rep.setResolved();
-						setResolved();
-						setReports();						
-					} else {
-						JOptionPane.showMessageDialog(null, "Has already been resolved.");
-					}
-				}
-			}
-		});
-		backButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
-		bottomPane.add(resolveIssue);
-		bottomPane.add(backButton);
-		
-		add(bottomPane, BorderLayout.SOUTH);
-		setTitle("Moderator Reports");
-		setResizable(false);
-		
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setSize(400, 200);
-		setLocationRelativeTo(null);
-		setVisible(true);
-	}
-	
-	void setReports() {
-		DefaultListModel<String> reportList = new DefaultListModel<String>();
-		for(ReportClass rep : reports) {
-			reportList.addElement(rep.getListDesc());
-		}
-		
-		reportsList.setModel(reportList);
-	}
+
+        setReports();
+
+        JPanel bottomPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        resolveIssue.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (reportsList.isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please select a report first.");
+                }
+                else {
+                    int repElem = reportsList.getSelectedIndex();
+                    ReportClass rep = reports.get(repElem);
+
+                    if (rep.isOpen()) {
+                        rep.setResolved();
+                        setResolved();
+                        setReports();
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Has already been resolved.");
+                    }
+                }
+            }
+        });
+        warnButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new WarnFrame(socket, in, out, user);
+            }
+        });
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new DeleteUserFrame(socket, in, out, user);
+            }
+        });
+
+        bottomPane.add(resolveIssue);
+        bottomPane.add(warnButton);
+        bottomPane.add(deleteButton);
+
+        add(bottomPane, BorderLayout.SOUTH);
+        setTitle("User Reports");
+        setResizable(false);
+
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(400, 200);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    void setReports() {
+        DefaultListModel<String> reportList = new DefaultListModel<String>();
+        for (ReportClass rep : reports) {
+            reportList.addElement(rep.getListDesc());
+        }
+        reportsList.setModel(reportList);
+    }
 
     void setResolved() {
         try {
-            //out.writeObject(new String("RESOLVE"));
+            // out.writeObject(new String("RESOLVE"));
             out.writeObject(new MessageClass("resolve_report", ""));
             out.writeObject(reports);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             if (e.getClass().equals(IOException.class)) {
                 System.out.println("Accept failed: 4457");
                 System.exit(-1);

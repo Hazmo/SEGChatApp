@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -94,6 +93,7 @@ public class SettingsClass extends JFrame implements ActionListener {
             center.add(modAppointField);
             center.add(modDismissLabel);
             center.add(modDismissField);
+
         }
 
         final JButton okButton = new JButton("Ok");
@@ -121,6 +121,7 @@ public class SettingsClass extends JFrame implements ActionListener {
         });
 
         setVisible(true);
+        setLocationRelativeTo(null);
         pack();
     }
 
@@ -180,6 +181,16 @@ public class SettingsClass extends JFrame implements ActionListener {
                     JOptionPane.showMessageDialog(this,
                             "You cannot modify your own moderator status!");
                     this.dispose();
+                    break;
+                }
+                case (6): {
+                    JOptionPane.showMessageDialog(this, "User with " + modAppointField.getText()
+                            + " ID has not been found!");
+                    break;
+                }
+                case (7): {
+                    JOptionPane.showMessageDialog(this, "User with " + modDismissField.getText()
+                            + " ID has not been found!");
                     break;
                 }
                 }

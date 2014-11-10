@@ -70,7 +70,7 @@ class UserReport extends JFrame implements ActionListener{
         JPanel south = new JPanel(new FlowLayout());
 
 
-
+        
         JLabel question = new JLabel(questionString);
         JLabel detailsLabel = new JLabel("Why do you want to report about this?");
         detailsTextArea = new JTextArea(10, 30);

@@ -1,6 +1,4 @@
-
 package src;
-
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -30,21 +28,23 @@ public class ChatServer {
             ok = 4455;
             mainServerSocket = new ServerSocket(4455);
 
-            //registerServer = new ServerSocket(4459);
+            // registerServer = new ServerSocket(4459);
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("Could not listen to port " + ok);
             System.exit(-1);
         }
 
-        //LoginThread lt = new LoginThread(loginServer);
-        //lt.start();
+        // LoginThread lt = new LoginThread(loginServer);
+        // lt.start();
 
         MainServerThread tlst = new MainServerThread(mainServerSocket);
         tlst.start();
         MainChatThread mct = new MainChatThread(server);
         mct.start();
     }
+
     public static void main(String args[]) {
         ChatServer cs = new ChatServer();
         cs.listenSocket();

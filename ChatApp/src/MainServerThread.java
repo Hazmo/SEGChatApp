@@ -1,10 +1,11 @@
 package src;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.ServerSocket;
-import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.swing.DefaultListModel;
 
 /**
  * Created by Harry on 05/11/2014.
@@ -18,7 +19,7 @@ public class MainServerThread extends Thread {
     DefaultListModel topicsModel = new DefaultListModel();
     ArrayList<ChatRoomClass> chatRooms = new ArrayList<>();
     ArrayList<UserClass> users = new ArrayList<UserClass>();
-
+    HashMap<String, WarningClass> warnings = new HashMap<String, WarningClass>();
     ArrayList<ReportClass> reports = new ArrayList<>();
 
     public MainServerThread(ServerSocket server) {
@@ -43,6 +44,10 @@ public class MainServerThread extends Thread {
             topics.add(new TopicClass(topicName));
             topicsModel.addElement(topicName);
         }
+    }
+
+    public synchronized WarningClass getWarning(String userID) {
+        return warnings.get(userID);
     }
 
     public synchronized void addUser(UserClass user) {
@@ -85,5 +90,13 @@ public class MainServerThread extends Thread {
 
     public synchronized void addReport(ReportClass report) {
         reports.add(report);
+    }
+
+    public synchronized void setWarnings(HashMap<String, WarningClass> warningsSent) {
+        warnings = warningsSent;
+    }
+
+    public synchronized void addWarning(WarningClass warning) {
+        warnings.put(warning.getUser(), warning);
     }
 }
